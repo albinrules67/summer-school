@@ -253,9 +253,6 @@ function showDetail(el){
 }
 function closeDetail(){document.getElementById("dm").classList.remove("s");document.body.style.overflow=""}
 document.getElementById("dm").addEventListener("click",function(e){if(e.target===this)closeDetail()});
-document.addEventListener("click",function(e){
-  var c=e.target.closest(".c");
-  if(c&&!e.target.closest(".ov")&&!e.target.closest(".dmc")){e.preventDefault();showDetail(c)}
-});
+// Cards navigate to detail page via onclick on the element
 </script>
 </body></html>
