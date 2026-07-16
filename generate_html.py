@@ -94,7 +94,7 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 .ovbt{font-weight:700;color:#fff;font-size:15px}
 .ovbc{font-size:11px;color:var(--fg2)}
 .ovf{background:var(--bg2);border-bottom:var(--bw);padding:20px 24px;display:flex;flex-direction:column;gap:14px}
-.ovf>div{max-width:640px;margin:0 auto;width:100%}
+.ovf .ovfs,.ovf .ovfg,.ovf .ovff{max-width:640px;margin-left:auto;margin-right:auto;width:100%}
 .ovfs{position:relative}
 .ovfs svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#444}
 .ovfs input{width:100%;padding:11px 14px 11px 40px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:14px;outline:none;transition:.2s}.ovfs input:focus{border-color:var(--r1)}.ovfs input::placeholder{color:#444}
@@ -107,6 +107,12 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 .fbl{border-color:rgba(235,75,75,.2);color:var(--r1);font-weight:600;background:rgba(235,75,75,.04)}.fbl:hover{background:rgba(235,75,75,.1);color:#fff}
 .ovff{display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid rgba(255,255,255,.03)}
 .ovrc{font-size:11px;color:var(--fg2)}
+.gs{padding:16px 24px;background:var(--bg2);border-bottom:var(--bw)}
+.gs>div{max-width:1280px;margin:0 auto;position:relative}
+.gs svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#444}
+.gs input{width:100%;padding:11px 14px 11px 40px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:14px;outline:none;transition:.2s}
+.gs input:focus{border-color:var(--r1)}.gs input::placeholder{color:#444}
+.gsc{text-align:center;padding:6px 0;font-size:11px;color:var(--fg2)}
 .ovg{padding:24px}
 </style>'''
 # --- END CSS ---
@@ -123,7 +129,10 @@ lines.append('<nav class="nv"><div><div class="nvl"><div class="nvg">CS</div><di
 lines.append(f'<div class="hr"><div class="hri"><div class="hrt"><span></span>Complete Armory &bull; {t} finishes</div><h1 class="hrh">CS2 <em>Skin Vault</em></h1><p class="hrp">Browse 10 featured skins per category, or dive into the full catalog with search and filters.</p></div></div>')
 
 # STATS
-lines.append(f'<div class="st"><div><div><div class="stn">{t}+</div><div class="stl">Total Skins</div></div><div><div class="stn">7</div><div class="stl">Rarity Tiers</div></div><div><div class="stn">5</div><div class="stl">Wear Levels</div></div><div><div class="stn">10</div><div class="stl">Per Category</div></div></div></div>')
+lines.append(f'<div class="st"><div><div><div class="stn">{t}+</div><div class="stl">Total Skins</div></div><div><div class="stn">7</div><div class="stl">Rarity Tiers</div></div><div><div class="stn">5</div><div class="stl">Wear Levels</div></div><div><div class="stn" id="gc">10</div><div class="stl">Showing</div></div></div></div>')
+
+# GLOBAL SEARCH BAR
+lines.append('<div class="gs"><div><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="gsi" placeholder="Search all 1,974 skins..." oninput="globalFilter()"></div><div class="gsc" id="gsc"></div></div>')
 
 # MAIN
 lines.append('<div class="mn">')
@@ -166,6 +175,21 @@ lines.append('<footer style="background:var(--bg2);border-top:var(--bw);padding:
 
 # JS
 js = '''<script>
+function globalFilter(){
+  var s=document.getElementById("gsi").value.toLowerCase().trim();
+  var cards=document.querySelectorAll(".mn .c"),v=0;
+  cards.forEach(function(cd){
+    if(!s||cd.dataset.n.indexOf(s)!==-1){cd.classList.remove("hide");v++}
+    else{cd.classList.add("hide")}
+  });
+  document.getElementById("gc").textContent=v;
+  document.getElementById("gsc").textContent=v===0?"No skins match":v+" skins shown";
+  // Hide empty sections
+  document.querySelectorAll(".sc").forEach(function(sec){
+    var vis=sec.querySelector(".c:not(.hide)");
+    sec.style.display=vis?"":"none"
+  })
+}
 function openCat(cid){
   document.querySelectorAll(".ov").forEach(function(o){o.classList.remove("s")});
   document.getElementById("o-"+cid).classList.add("s");document.body.style.overflow="hidden";
