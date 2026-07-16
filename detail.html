@@ -83,8 +83,9 @@ if (!skinSlug) {
     if (d.collection || d.container) {
       html += '<div class="sc"><div class="sch">Origin</div><div class="scc">';
       if (d.container) html += 'Obtained from <strong>'+d.container+'</strong>. ';
-      if (d.collection) html += 'Part of the <strong>'+d.collection+'</strong>. ';
-      if (d.collection_img) html += '<br><img src="'+d.collection_img+'" alt="'+d.collection+'" style="max-width:200px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06)">';
+      if (d.collection) {
+        html += 'Part of the <strong>'+d.collection+'</strong>. ';
+      }
       html += '</div></div>';
     }
     if (d.rating) {
