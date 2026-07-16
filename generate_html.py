@@ -13,23 +13,20 @@ for wn, sn, url, r in all_skins:
 all_skins = fixed
 
 ra_info = {
-    'Covert': ('covert', '#eb4b4b', 'rgba(235,75,75,0.12)'),
-    'Classified': ('classified', '#d32ce6', 'rgba(211,44,230,0.12)'),
-    'Restricted': ('restricted', '#8847ff', 'rgba(136,71,255,0.12)'),
-    'Mil-Spec Grade': ('milspec', '#4b69ff', 'rgba(75,105,255,0.12)'),
-    'Industrial Grade': ('industrial', '#5e98d9', 'rgba(94,152,217,0.12)'),
-    'Consumer Grade': ('consumer', '#b0b0b0', 'rgba(176,176,176,0.12)'),
-    'Extraordinary': ('knife', '#ffd700', 'rgba(255,215,0,0.12)'),
+    'Covert': ('covert', '#eb4b4b'), 'Classified': ('classified', '#d32ce6'),
+    'Restricted': ('restricted', '#8847ff'), 'Mil-Spec Grade': ('milspec', '#4b69ff'),
+    'Industrial Grade': ('industrial', '#5e98d9'), 'Consumer Grade': ('consumer', '#b0b0b0'),
+    'Extraordinary': ('knife', '#ffd700'),
 }
 r_order = {'Covert':0,'Classified':1,'Restricted':2,'Mil-Spec Grade':3,'Industrial Grade':4,'Consumer Grade':5,'Extraordinary':0}
 
 categories = [
-    ('rifles', 'Rifles', ['ak-47','m4a4','m4a1-s','awp','ssg 08','sg 553','aug','famas','galil ar','scar-20','g3sg1']),
-    ('pistols', 'Pistols', ['desert eagle','usp-s','glock-18','p2000','p250','cz75-auto','five-seven','tec-9','dual berettas','r8 revolver']),
-    ('smgs', 'SMGs', ['mac-10','mp9','mp5-sd','mp7','ump-45','p90','pp-bizon']),
-    ('heavies', 'Heavy', ['mag-7','nova','xm1014','sawed-off','m249','negev']),
-    ('knives', 'Knives', ['karambit','butterfly knife','m9 bayonet','talon knife','bayonet','flip knife','shadow daggers','bowie knife','stiletto knife','ursus knife','nomad knife','skeleton knife','classic knife','gut knife','huntsman knife','falchion knife','navaja knife','paracord knife','survival knife','kukri knife']),
-    ('gloves', 'Gloves', ['hand wraps','sport gloves','moto gloves','driver gloves','specialist gloves','bloodhound gloves','broken fang gloves','hydra gloves']),
+    ('rifles', 'Rifles', '🔫', ['ak-47','m4a4','m4a1-s','awp','ssg 08','sg 553','aug','famas','galil ar','scar-20','g3sg1']),
+    ('pistols', 'Pistols', '🔫', ['desert eagle','usp-s','glock-18','p2000','p250','cz75-auto','five-seven','tec-9','dual berettas','r8 revolver']),
+    ('smgs', 'SMGs', '⚡', ['mac-10','mp9','mp5-sd','mp7','ump-45','p90','pp-bizon']),
+    ('heavies', 'Heavy', '💥', ['mag-7','nova','xm1014','sawed-off','m249','negev']),
+    ('knives', 'Knives', '★', ['karambit','butterfly knife','m9 bayonet','talon knife','bayonet','flip knife','shadow daggers','bowie knife','stiletto knife','ursus knife','nomad knife','skeleton knife','classic knife','gut knife','huntsman knife','falchion knife','navaja knife','paracord knife','survival knife','kukri knife']),
+    ('gloves', 'Gloves', '🧤', ['hand wraps','sport gloves','moto gloves','driver gloves','specialist gloves','bloodhound gloves','broken fang gloves','hydra gloves']),
 ]
 
 weapon_display = {
@@ -51,8 +48,7 @@ weapon_display = {
 total = len(all_skins)
 
 cat_data = {}
-cat_wp_list = {}
-for sid, title, wp_list in categories:
+for sid, title, icon, wp_list in categories:
     group = []
     wp_map = {}
     for wl in wp_list:
@@ -67,220 +63,258 @@ for sid, title, wp_list in categories:
     cat_data[sid] = group
 
 def card_html(wn, sn, url, r):
-    cls, hex, bg = ra_info.get(r, ('milspec', '#4b69ff', 'rgba(75,105,255,0.12)'))
-    rup = r.upper()
-    wep = wn.lower().replace("'", "&apos;")
-    nm = (wn + ' | ' + sn).lower()
-    return ('<div class="card" data-w="{w}" data-r="{rar}" data-n="{nm}">'
-            '<div class="card-shine"></div>'
-            '<div class="card-img"><img src="{u}" alt="{wn} {sn}" loading="lazy"></div>'
-            '<div class="card-body">'
-            '<span class="card-rarity" style="color:{h}">{rup}</span>'
-            '<h3 class="card-name">{wn}<br>{sn}</h3>'
-            '</div></div>').format(c=cls, w=wep, rar=r, nm=nm, u=url, wn=wn, sn=sn, h=hex, rup=rup)
-
-cat_counts = {}
-for sid, title, wp_list in categories:
-    cat_counts[sid] = len(cat_data[sid])
+    cls, hex = ra_info.get(r, ('milspec', '#4b69ff'))
+    nm_lower = (wn + ' | ' + sn).lower()
+    return ('<div class="c" data-w="' + wn.lower() + '" data-r="' + r + '" data-n="' + nm_lower + '">'
+            '<div class="ci"><img src="' + url + '" alt="' + wn + ' ' + sn + '" loading="lazy"></div>'
+            '<div class="cb">'
+            '<span class="cr" style="color:' + hex + '">' + r.upper() + '</span>'
+            '<h3 class="cn">' + wn + '<br>' + sn + '</h3>'
+            '</div></div>')
 
 lines = []
 def L(s): lines.append(s)
 
 L('<!DOCTYPE html><html lang="en"><head>')
 L('<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">')
-L('<title>CS2 Skin Vault \u2014 Complete Armory</title>')
+L('<title>CS2 Skin Vault</title>')
 L('<link rel="preconnect" href="https://fonts.googleapis.com">')
 L('<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>')
 L('<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">')
+
+# CSS
 L('<style>')
 L('*{box-sizing:border-box;margin:0;padding:0}')
 L('html{scroll-behavior:smooth}')
-L('body{font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;background:#050508;color:#e0e0e0;line-height:1.5}')
+L('body{font-family:"Inter",sans-serif;background:#07070d;color:#ddd;line-height:1.5;-webkit-font-smoothing:antialiased}')
 L('.f{font-family:"Orbitron",sans-serif}')
-L(':root{--c1:#eb4b4b;--c2:#d32ce6;--c3:#8847ff;--c4:#4b69ff;--c5:#5e98d9;--c6:#b0b0b0;--c7:#ffd700;--bg:#050508;--bg2:#0b0b12;--bg3:#111120}')
-L('')
-L('.hero{background:linear-gradient(160deg,#050508,#0b0b12,#111120);position:relative;overflow:hidden;min-height:50vh;display:flex;align-items:center;padding-top:64px}')
-L('.hero::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(235,75,75,0.06) 0%,transparent 70%),radial-gradient(ellipse at 70% 50%,rgba(136,71,255,0.04) 0%,transparent 60%);pointer-events:none}')
-L('.hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(235,75,75,0.04) 0%,transparent 70%);top:-200px;left:50%;transform:translateX(-50%);pointer-events:none}')
-L('')
-L('.nav{background:rgba(5,5,8,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.04);position:fixed;top:0;left:0;width:100%;z-index:100;height:64px}')
-L('.nav-in{max-width:1400px;margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between}')
-L('.nav-l{display:flex;align-items:center;gap:8px}')
-L('.nav-logo{width:32px;height:32px;border-radius:8px;background:var(--c1);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:900;font-family:"Orbitron",sans-serif}')
-L('.nav-title{font-family:"Orbitron",sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.5px}')
-L('.nav-badge{padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.04);font-size:9px;color:#666;font-weight:600;letter-spacing:.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.04)}')
-L('.nav-links{display:none;gap:24px}')
-L('@media(min-width:768px){.nav-links{display:flex}}')
-L('.nav-links a{color:#666;font-size:13px;font-weight:500;text-decoration:none;transition:color .2s}')
-L('.nav-links a:hover{color:#fff}')
-L('.nav-links a.active{color:var(--c1)}')
-L('')
-L('.search-section{background:var(--bg2);border-bottom:1px solid rgba(255,255,255,0.04);position:sticky;top:64px;z-index:50;padding:16px 0}')
-L('.search-in{max-width:1400px;margin:0 auto;padding:0 24px}')
-L('.search-wrap{position:relative;margin-bottom:12px}')
-L('.search-wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#444}')
-L('.search-wrap input{width:100%;padding:14px 14px 14px 44px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#fff;font-size:14px;outline:none;transition:border .2s}')
-L('.search-wrap input:focus{border-color:var(--c1)}')
-L('.search-wrap input::placeholder{color:#444}')
-L('.filters{display:flex;flex-wrap:wrap;align-items:center;gap:5px}')
-L('.filters .l{color:#444;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;min-width:45px}')
-L('.fb{padding:5px 13px;border-radius:20px;border:1px solid rgba(255,255,255,0.06);background:transparent;font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;color:#aaa}')
-L('.fb:hover{border-color:rgba(255,255,255,0.15);color:#ddd}')
-L('.fb.off{opacity:.15;text-decoration:line-through;pointer-events:none}')
-L('.fb.off:hover{opacity:.2}')
-L('.fb-reset{border-color:rgba(235,75,75,0.3);color:var(--c1);font-weight:600}')
-L('.fb-reset:hover{background:rgba(235,75,75,0.08);border-color:rgba(235,75,75,0.5)}')
-L('')
-L('.stats{background:var(--bg2);border-bottom:1px solid rgba(255,255,255,0.04);padding:14px 0}')
-L('.stats-in{max-width:1400px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:repeat(2,1fr);gap:8px;text-align:center}')
-L('@media(min-width:640px){.stats-in{grid-template-columns:repeat(4,1fr)}}')
-L('.stat-num{font-size:20px;font-weight:800;color:#fff;font-family:"Orbitron",sans-serif}')
-L('.stat-lbl{font-size:11px;color:#555;margin-top:2px}')
-L('')
-L('.main{max-width:1400px;margin:0 auto;padding:24px}')
-L('')
-L('.section{margin-bottom:32px}')
-L('.section-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.04)}')
-L('.section-h-l{display:flex;align-items:center;gap:10px}')
-L('.section-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px}')
-L('.section-title{font-size:18px;font-weight:700;color:#fff;font-family:"Orbitron",sans-serif;letter-spacing:.3px}')
-L('.section-count{font-size:12px;color:#555;font-weight:500}')
-L('.section.hidden{display:none}')
-L('')
-L('.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}')
-L('@media(min-width:540px){.grid{grid-template-columns:repeat(3,1fr)}}')
-L('@media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr)}}')
-L('@media(min-width:1024px){.grid{grid-template-columns:repeat(5,1fr)}}')
-L('@media(min-width:1280px){.grid{grid-template-columns:repeat(6,1fr)}}')
-L('')
-L('.card{background:var(--bg2);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.04);transition:all .3s;cursor:pointer;position:relative}')
-L('.card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,0.1);box-shadow:0 12px 40px rgba(0,0,0,.4)}')
-L('.card.hidden{display:none!important}')
-L('.card-shine{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 20%,rgba(255,255,255,0.02) 50%,transparent 80%);transform:rotate(25deg);opacity:0;transition:opacity .5s;pointer-events:none;z-index:1}')
-L('.card:hover .card-shine{opacity:1;animation:sh 1s ease-in-out}')
-L('@keyframes sh{0%{transform:translateX(-100%) rotate(25deg)}100%{transform:translateX(100%) rotate(25deg)}}')
-L('.card-img{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);display:flex;align-items:center;justify-content:center;padding:12px;aspect-ratio:16/9}')
-L('.card-img img{width:100%;height:100%;object-fit:contain;transition:transform .4s;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}')
-L('.card:hover .card-img img{transform:scale(1.06)}')
-L('.card-body{padding:10px 12px 12px}')
-L('.card-rarity{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}')
-L('.card-name{color:#fff;font-size:11px;font-weight:600;line-height:1.4;margin-top:3px}')
-L('')
-L('.ft{background:var(--bg2);border-top:1px solid rgba(255,255,255,0.04);padding:32px 24px;text-align:center}')
-L('.ft p{color:#444;font-size:12px;line-height:1.6}')
-L('.ft p a{color:#666;text-decoration:none;transition:color .2s}')
-L('.ft p a:hover{color:#fff}')
-L('')
-L('.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(235,75,75,0.15);border:1px solid rgba(235,75,75,0.3);border-radius:10px;padding:8px 20px;font-size:12px;color:var(--c1);z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;backdrop-filter:blur(10px)}')
-L('.toast.show{opacity:1}')
+L(':root{--r1:#eb4b4b;--r2:#d32ce6;--r3:#8847ff;--r4:#4b69ff;--r5:#5e98d9;--r6:#b0b0b0;--r7:#ffd700}')
+
+# Nav
+L('.nv{position:fixed;top:0;left:0;width:100%;height:60px;z-index:100;background:rgba(7,7,13,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.04)}')
+L('.nvi{max-width:1200px;margin:0 auto;padding:0 20px;height:100%;display:flex;align-items:center;justify-content:space-between}')
+L('.nvl{display:flex;align-items:center;gap:10px}')
+L('.nvg{width:30px;height:30px;border-radius:6px;background:var(--r1);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:900;font-family:"Orbitron",sans-serif}')
+L('.nvt{font-family:"Orbitron",sans-serif;font-size:14px;font-weight:700;color:#fff}')
+L('.nvb{padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.04);font-size:9px;color:#555;border:1px solid rgba(255,255,255,.04)}')
+L('.nvr{display:none;gap:20px}@media(min-width:768px){.nvr{display:flex}}')
+L('.nvr a{color:#555;font-size:13px;text-decoration:none;transition:color .2s}')
+L('.nvr a:hover{color:#eee}')
+
+# Hero
+L('.hr{background:linear-gradient(160deg,#07070d,#0c0c18,#121225);position:relative;overflow:hidden;padding:100px 0 60px}')
+L('.hr::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(235,75,75,.07) 0%,transparent 70%),radial-gradient(ellipse at 70% 50%,rgba(136,71,255,.05) 0%,transparent 60%);pointer-events:none}')
+L('.hri{max-width:1200px;margin:0 auto;padding:0 20px;position:relative;z-index:1}')
+L('.hrt{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;background:rgba(235,75,75,.08);border:1px solid rgba(235,75,75,.15);margin-bottom:16px;font-size:11px;color:var(--r1);font-weight:600}')
+L('.hrh{font-size:34px;font-weight:900;color:#fff;line-height:1.15;margin-bottom:12px}')
+L('.hrp{color:#555;font-size:14px;max-width:450px;line-height:1.6}')
+
+# Search bar - clean, minimal
+L('.sr{background:#0c0c18;border-bottom:1px solid rgba(255,255,255,.04);padding:16px 0;position:sticky;top:60px;z-index:50}')
+L('.sri{max-width:1200px;margin:0 auto;padding:0 20px}')
+L('.sw{position:relative}')
+L('.sw svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#444}')
+L('.sw input{width:100%;padding:13px 16px 13px 44px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);color:#fff;font-size:15px;outline:none;transition:border .25s}')
+L('.sw input:focus{border-color:var(--r1)}')
+L('.sw input::placeholder{color:#444}')
+L('.ft{overflow:hidden;max-height:0;transition:max-height .35s ease,opacity .3s ease, margin .3s ease;opacity:0;margin-top:0}')
+L('.ft.show{max-height:500px;opacity:1;margin-top:14px}')
+L('.ftr{display:flex;flex-wrap:wrap;align-items:center;gap:6px}')
+L('.ftl{color:#444;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-right:6px;min-width:42px}')
+L('.fb{padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:transparent;font-size:11px;cursor:pointer;transition:all .2s;color:#999}')
+L('.fb:hover{border-color:rgba(255,255,255,.15);color:#ddd}')
+L('.fb.off{opacity:.15;text-decoration:line-through}')
+L('.fbr{color:var(--r1);border-color:rgba(235,75,75,.3);font-weight:600}')
+L('.fbr:hover{background:rgba(235,75,75,.08)}')
+
+# Stats
+L('.st{background:#0c0c18;border-bottom:1px solid rgba(255,255,255,.04);padding:12px 0}')
+L('.sti{max-width:1200px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}')
+L('.stn{font-size:18px;font-weight:800;color:#fff;font-family:"Orbitron",sans-serif}')
+L('.stl{font-size:10px;color:#555;margin-top:2px}')
+
+# Main page
+L('.mn{max-width:1200px;margin:0 auto;padding:24px 20px}')
+
+# Section
+L('.sc{margin-bottom:36px}')
+L('.sch{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.04)}')
+L('.schl{display:flex;align-items:center;gap:8px}')
+L('.sci{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px}')
+L('.sct{font-size:16px;font-weight:700;color:#fff;font-family:"Orbitron",sans-serif}')
+L('.scc{font-size:11px;color:#555}')
+L('.scv{padding:8px 18px;border-radius:8px;border:1px solid var(--r1);color:var(--r1);font-size:12px;cursor:pointer;background:transparent;transition:all .25s;font-weight:600;text-decoration:none}')
+L('.scv:hover{background:rgba(235,75,75,.08)}')
+
+# Grid - main page shows 10 items
+L('.gd{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}')
+L('@media(min-width:500px){.gd{grid-template-columns:repeat(3,1fr)}}')
+L('@media(min-width:700px){.gd{grid-template-columns:repeat(4,1fr)}}')
+L('@media(min-width:900px){.gd{grid-template-columns:repeat(5,1fr)}}')
+
+# Card
+L('.c{background:#0c0c18;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.04);transition:all .3s;cursor:pointer}')
+L('.c:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.08);box-shadow:0 8px 30px rgba(0,0,0,.4)}')
+L('.c.hide{display:none!important}')
+L('.ci{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);display:flex;align-items:center;justify-content:center;padding:8px;aspect-ratio:16/10}')
+L('.ci img{width:100%;height:100%;object-fit:contain;transition:transform .35s;filter:drop-shadow(0 3px 10px rgba(0,0,0,.5))}')
+L('.c:hover .ci img{transform:scale(1.05)}')
+L('.cb{padding:8px 10px 10px}')
+L('.cr{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}')
+L('.cn{color:#fff;font-size:11px;font-weight:600;line-height:1.35;margin-top:3px}')
+
+# Catalog overlay (full page per category)
+L('.cato{position:fixed;inset:0;background:#07070d;z-index:200;overflow-y:auto;display:none}')
+L('.cato.show{display:block}')
+L('.cath{position:sticky;top:0;z-index:10;background:#0c0c18;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;padding:12px 20px}')
+L('.cathl{display:flex;align-items:center;gap:10px}')
+L('.catb{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid rgba(255,255,255,.08);color:#aaa;font-size:12px;cursor:pointer;background:transparent;transition:all .2s}')
+L('.catb:hover{border-color:var(--r1);color:var(--r1)}')
+L('.catt{font-family:"Orbitron",sans-serif;font-size:15px;font-weight:700;color:#fff}')
+L('.cato .sri{padding:14px 20px}')
+L('.cato .gd{gap:10px}')
+L('@media(min-width:500px){.cato .gd{grid-template-columns:repeat(3,1fr)}}')
+L('@media(min-width:700px){.cato .gd{grid-template-columns:repeat(4,1fr)}}')
+L('@media(min-width:1000px){.cato .gd{grid-template-columns:repeat(5,1fr)}}')
+L('@media(min-width:1200px){.cato .gd{grid-template-columns:repeat(6,1fr)}}')
+L('.catg{padding:16px 20px 40px}')
+L('.catc{font-size:11px;color:#555;margin-top:12px;text-align:center}')
+
+# Footer
+L('.ftr2{background:#0c0c18;border-top:1px solid rgba(255,255,255,.04);padding:28px 20px;text-align:center}')
+L('.ftr2 p{color:#444;font-size:11px;max-width:400px;margin:0 auto;line-height:1.6}')
+
 L('</style></head><body>')
 
 # Navbar
-L('<nav class="nav"><div class="nav-in"><div class="nav-l">')
-L('<span class="nav-logo">CS</span><span class="nav-title">Skin Vault</span><span class="nav-badge">v2.0</span></div>')
-L('<div class="nav-links">')
-for sid, title, _ in categories:
+L('<nav class="nv"><div class="nvi"><div class="nvl"><span class="nvg">CS</span><span class="nvt">Skin Vault</span><span class="nvb">v2.0</span></div>')
+L('<div class="nvr">')
+for sid, title, icon, _ in categories:
     L('<a href="#s-'+sid+'">'+title+'</a>')
-L('</div>')
-L('<button id="mb" style="background:none;border:none;color:#666;font-size:20px;cursor:pointer;display:block;padding:4px" onclick="document.getElementById(\'mm\').classList.toggle(\'show\')">☰</button></div>')
-L('<div id="mm" style="display:none;background:var(--bg2);border-top:1px solid rgba(255,255,255,0.04);padding:12px 24px;flex-direction:column;gap:8px">')
-for sid, title, _ in categories:
-    L('<a href="#s-'+sid+'" style="color:#666;font-size:13px;text-decoration:none;padding:4px 0" onclick="document.getElementById(\'mm\').style.display=\'none\'">'+title+'</a>')
+L('</div><button id="mb" style="background:none;border:none;color:#555;font-size:20px;cursor:pointer" onclick="document.getElementById(\'mm\').style.display=document.getElementById(\'mm\').style.display==\'block\'?\'none\':\'block\'">☰</button></div>')
+L('<div id="mm" style="display:none;background:#0c0c18;border-top:1px solid rgba(255,255,255,.04);padding:12px 20px;flex-direction:column;gap:6px">')
+for sid, title, icon, _ in categories:
+    L('<a href="#s-'+sid+'" style="color:#888;font-size:13px;text-decoration:none;padding:4px 0" onclick="document.getElementById(\'mm\').style.display=\'none\'">'+icon+' '+title+'</a>')
 L('</div></nav>')
 
 # Hero
-r0 = cat_data['rifles'][0] if cat_data['rifles'] else ('','','','')
-r2d = [x for x in cat_data['rifles'] if 'asiimov' in x[1].lower() and 'm4a4' in x[0].lower()]
-r2 = r2d[0] if r2d else (cat_data['rifles'][2] if len(cat_data['rifles'])>2 else ('','','',''))
-k0 = cat_data['knives'][0] if cat_data['knives'] else ('','','','')
-L('<section class="hero"><div class="hero-glow"></div>')
-L('<div style="max-width:1400px;margin:0 auto;padding:60px 24px;position:relative;z-index:1;width:100%">')
-L('<div style="max-width:600px">')
-L('<div style="display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:rgba(235,75,75,0.08);border:1px solid rgba(235,75,75,0.15);margin-bottom:16px">')
-L('<span style="width:6px;height:6px;border-radius:50%;background:var(--c1);animation:pulse 2s infinite"></span>')
-L('<span style="font-size:11px;color:var(--c1);font-weight:600">Complete Armory &bull; '+str(total)+' skins</span></div>')
-L('<h1 class="f" style="font-size:36px;font-weight:900;color:#fff;line-height:1.1;margin-bottom:12px">CS2<br><span style="background:linear-gradient(135deg,var(--c1),#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Skin Vault</span></h1>')
-L('<p style="color:#555;font-size:14px;line-height:1.6;max-width:480px">Every weapon finish in Counter-Strike 2. Filter by rarity, weapon, or search by name.</p></div></div></section>')
-L('<style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>')
-
-# Stats
-L('<div class="stats"><div class="stats-in">')
-L('<div><div class="stat-num">'+str(total)+'+</div><div class="stat-lbl">Total Skins</div></div>')
-L('<div><div class="stat-num">7</div><div class="stat-lbl">Rarity Tiers</div></div>')
-L('<div><div class="stat-num">5</div><div class="stat-lbl">Wear Levels</div></div>')
-L('<div><div class="stat-num" id="fc">'+str(total)+'</div><div class="stat-lbl">Showing</div></div>')
+L('<div class="hr"><div class="hri">')
+L('<div class="hrt">Complete Armory &bull; '+str(total)+' finishes</div>')
+L('<h1 class="hrh">CS2 <span style="background:linear-gradient(135deg,var(--r1),#ff8c00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Skin Vault</span></h1>')
+L('<p class="hrp">Every weapon finish in CS2. Browse featured skins or dive into a category.</p>')
 L('</div></div>')
 
-# Search + Filters
-L('<div class="search-section"><div class="search-in">')
-L('<div class="search-wrap"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>')
-L('<input type="text" id="gs" placeholder="Search any skin by name..." oninput="af()"></div>')
-L('<div class="filters"><span class="l">Rarity</span>')
+# Stats
+L('<div class="st"><div class="sti">')
+L('<div><div class="stn">'+str(total)+'+</div><div class="stl">Total Skins</div></div>')
+L('<div><div class="stn">7</div><div class="stl">Rarity Tiers</div></div>')
+L('<div><div class="stn">5</div><div class="stl">Wear Levels</div></div>')
+L('<div><div class="stn" id="fc">10</div><div class="stl">Per Category</div></div>')
+L('</div></div>')
+
+# Search bar (toggles appear on focus)
+L('<div class="sr"><div class="sri">')
+L('<div class="sw"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>')
+L('<input type="text" id="gs" placeholder="Search skins across all categories..." onfocus="document.getElementById(\'ftm\').classList.add(\'show\')" oninput="af()">')
+L('</div>')
+L('<div class="ft" id="ftm">')
+L('<div class="ftr"><span class="ftl">Rarity</span>')
 for rn in ['Covert','Classified','Restricted','Mil-Spec Grade','Industrial Grade','Consumer Grade']:
     c = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0'}[rn]
-    dn = rn.replace('Mil-Spec Grade','Mil-Spec').replace('Industrial Grade','Industrial').replace('Consumer Grade','Consumer')
-    L('<button class="fb fr" data-r="' + rn + '" onclick="tr(this.dataset.r)" style="color:' + c + '">' + dn + '</button>')
-L('<button class="fb fb-reset" onclick="rf()">Reset</button></div>')
-L('<div class="filters" style="margin-top:6px"><span class="l">Weapon</span>')
-
-all_weps = []
-seen = set()
-for sid, title, wp_list in categories:
+    ln = rn.replace('Mil-Spec Grade','Mil-Spec').replace('Industrial Grade','Industrial').replace('Consumer Grade','Consumer')
+    L('<button class="fb" data-r="'+rn+'" onclick="tr(this.dataset.r)" style="color:'+c+'">'+ln+'</button>')
+L('</div>')
+L('<div class="ftr" style="margin-top:6px"><span class="ftl">Weapon</span>')
+for sid, title, icon, wp_list in categories:
     for wl in wp_list:
-        if wl not in seen:
-            seen.add(wl)
-            all_weps.append(wl)
-for wl in all_weps:
-    dn = weapon_display.get(wl, wl.title())
-    L('<button class="fb fw" data-w="' + wl + '" onclick="tw(this.dataset.w)">' + dn + '</button>')
+        dn = weapon_display.get(wl, wl.title())
+        L('<button class="fb" data-w="'+wl+'" onclick="tw(this.dataset.w)" style="font-size:10px">'+dn+'</button>')
+L('</div>')
+L('<div class="ftr" style="margin-top:8px"><button class="fb fbr" onclick="rf()">Reset Filters</button></div>')
 L('</div></div></div>')
 
-# Sections
-section_icons = {'rifles':'🔫','pistols':'🔫','smgs':'⚡','heavies':'💥','knives':'★','gloves':'🧤'}
-section_colors = {'rifles':'#eb4b4b','pistols':'#4b69ff','smgs':'#8847ff','heavies':'#5e98d9','knives':'#ffd700','gloves':'#b8860b'}
-
-L('<div class="main">')
-for sid, title, wp_list in categories:
+# Main page sections
+L('<div class="mn">')
+for sid, title, icon, wp_list in categories:
     group = cat_data[sid]
-    icon = section_icons.get(sid, '')
-    col = section_colors.get(sid, '#fff')
-    cards = '\n'.join(card_html(wn, sn, url, r) for wn, sn, url, r in group)
-    L('<div class="section" id="s-'+sid+'">')
-    L('<div class="section-h"><div class="section-h-l"><div class="section-icon" style="background:'+col+'20;color:'+col+'">'+icon+'</div>')
-    L('<span class="section-title">'+title+'</span><span class="section-count" id="sc-'+sid+'">'+str(len(group))+'</span></div></div>')
-    L('<div class="grid" id="g-'+sid+'">'+cards+'</div></div>')
+    total_cat = len(group)
+    preview = group[:10]
+    cards = '\n'.join(card_html(wn, sn, url, r) for wn, sn, url, r in preview)
+    
+    section_icon_colors = {'rifles':'#eb4b4b','pistols':'#4b69ff','smgs':'#8847ff','heavies':'#5e98d9','knives':'#ffd700','gloves':'#b8860b'}
+    col = section_icon_colors.get(sid, '#fff')
+    
+    L('<div class="sc" id="s-'+sid+'">')
+    L('<div class="sch"><div class="schl"><div class="sci" style="background:'+col+'15;color:'+col+'">'+icon+'</div><span class="sct">'+title+'</span><span class="scc">'+str(total_cat)+'</span></div>')
+    L('<button class="scv" onclick="openCat(\''+sid+'\',\''+title+'\',\''+icon+'\')">View All '+str(total_cat)+' &rarr;</button></div>')
+    L('<div class="gd">'+cards+'</div></div>')
 
 L('</div>')
 
-# Footer
-L('<div class="ft"><p style="margin-bottom:6px">CS2 Skin Vault &bull; '+str(total)+' weapon finishes catalogued</p>')
-L('<p style="font-size:11px">Not affiliated with Valve Corporation. CS2 is a trademark of Valve.<br>Images sourced from Steam Community CDN.</p></div>')
+# Catalog overlays (one per category)
+for sid, title, icon, wp_list in categories:
+    group = cat_data[sid]
+    total_cat = len(group)
+    all_cards = '\n'.join(card_html(wn, sn, url, r) for wn, sn, url, r in group)
+    
+    L('<div class="cato" id="cato-'+sid+'">')
+    L('<div class="cath"><div class="cathl"><button class="catb" onclick="closeCat(\''+sid+'\')">&larr; Back</button><span class="catt">'+icon+' '+title+'</span></div><span style="color:#555;font-size:12px">'+str(total_cat)+' skins</span></div>')
+    # Filters inside catalog
+    L('<div class="sr" style="top:0;position:sticky"><div class="sri">')
+    L('<div class="sw"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>')
+    L('<input type="text" id="cgs-'+sid+'" placeholder="Search in '+title+'..." oninput="cf(\''+sid+'\')" class="cgi-'+sid+'">')
+    L('</div>')
+    L('<div class="ft show">')  # Always visible in catalog
+    L('<div class="ftr"><span class="ftl">Rarity</span>')
+    for rn in ['Covert','Classified','Restricted','Mil-Spec Grade','Industrial Grade','Consumer Grade']:
+        c = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0'}[rn]
+        ln = rn.replace('Mil-Spec Grade','Mil-Spec').replace('Industrial Grade','Industrial').replace('Consumer Grade','Consumer')
+        L('<button class="fb cfr-'+sid+'" data-r="'+rn+'" onclick="ctr(\''+sid+'\',this.dataset.r)" style="color:'+c+'">'+ln+'</button>')
+    L('</div>')
+    L('<div class="ftr" style="margin-top:6px"><span class="ftl">Weapon</span>')
+    for wl in wp_list:
+        dn = weapon_display.get(wl, wl.title())
+        L('<button class="fb cfw-'+sid+'" data-w="'+wl+'" onclick="ctw(\''+sid+'\',this.dataset.w)" style="font-size:10px">'+dn+'</button>')
+    L('</div>')
+    L('<div class="ftr" style="margin-top:8px"><button class="fb fbr" onclick="crf(\''+sid+'\')">Reset</button><span class="crc-'+sid+'" style="color:#555;font-size:11px;margin-left:12px">'+str(total_cat)+' matching</span></div>')
+    L('</div></div></div>')
+    L('<div class="catg"><div class="gd" id="cg-'+sid+'">'+all_cards+'</div><div class="catc" id="cem-'+sid+'"></div></div>')
+    L('</div>')
 
-# Toast
-L('<div class="toast" id="toast"></div>')
+# Footer
+L('<div class="ftr2"><p>CS2 Skin Vault &bull; '+str(total)+' weapon finishes &bull; Not affiliated with Valve Corporation</p></div>')
 
 # JS
 L('<script>')
 L('function af(){const s=document.getElementById("gs").value.toLowerCase().trim();')
-L('const rb=document.querySelectorAll(".fr");const wb=document.querySelectorAll(".fw");')
+L('const rb=document.querySelectorAll(".sr .fb[data-r]");const wb=document.querySelectorAll(".sr .fb[data-w]");')
 L('const ar=new Set();rb.forEach(b=>{if(!b.classList.contains("off"))ar.add(b.dataset.r)});')
 L('const aw=new Set();wb.forEach(b=>{if(!b.classList.contains("off"))aw.add(b.dataset.w)});')
-L('const c=document.querySelectorAll(".card");let v=0;')
+L('const c=document.querySelectorAll(".c");let v=0;c.forEach(cd=>{const w=cd.dataset.w;const r=cd.dataset.r;const n=cd.dataset.n;')
+L('const ms=!s||n.includes(s);const mr=ar.size===0||ar.has(r);const mw=aw.size===0||aw.has(w);')
+L('if(ms&&mr&&mw){cd.classList.remove("hide");v++}else{cd.classList.add("hide")}})}')
+L('function tr(r){const b=document.querySelector(".sr .fb[data-r=\'"+r+"\']");if(b){b.classList.toggle("off");af()}}')
+L('function tw(w){const b=document.querySelector(".sr .fb[data-w=\'"+w+"\']");if(b){b.classList.toggle("off");af()}}')
+L('function rf(){document.getElementById("gs").value="";document.querySelectorAll(".sr .fb.off").forEach(b=>b.classList.remove("off"));af()}')
+L('function openCat(sid,title,icon){document.querySelectorAll(".cato").forEach(o=>o.classList.remove("show"));document.getElementById("cato-"+sid).classList.add("show");document.body.style.overflow="hidden";cf(sid)}')
+L('function closeCat(sid){document.getElementById("cato-"+sid).classList.remove("show");document.body.style.overflow=""}')
+L('function cf(sid){const s=document.getElementById("cgs-"+sid).value.toLowerCase().trim();')
+L('const rb=document.querySelectorAll(".cfr-"+sid);const wb=document.querySelectorAll(".cfw-"+sid);')
+L('const ar=new Set();rb.forEach(b=>{if(!b.classList.contains("off"))ar.add(b.dataset.r)});')
+L('const aw=new Set();wb.forEach(b=>{if(!b.classList.contains("off"))aw.add(b.dataset.w)});')
+L('const c=document.querySelectorAll("#cg-"+sid+" .c");let v=0;')
 L('c.forEach(cd=>{const w=cd.dataset.w;const r=cd.dataset.r;const n=cd.dataset.n;')
 L('const ms=!s||n.includes(s);const mr=ar.size===0||ar.has(r);const mw=aw.size===0||aw.has(w);')
-L('if(ms&&mr&&mw){cd.classList.remove("hidden");v++}else{cd.classList.add("hidden")}});')
-L('document.getElementById("fc").textContent=v;')
-L('document.querySelectorAll(".section").forEach(sec=>{const g=sec.querySelector("[id^=\\"g-\\"]");')
-L('if(g){const hv=g.querySelector(".card:not(.hidden)");')
-L('sec.classList.toggle("hidden",!hv);')
-L('const sc=sec.querySelector("[id^=\\"sc-\\"]");if(sc){sc.textContent=hv?g.querySelectorAll(".card:not(.hidden)").length:"0"}}})}')
-L('function tr(r){const b=document.querySelector(".fr[data-r=\\""+r+"\\"]");if(b)b.classList.toggle("off");af()}')
-L('function tw(w){const b=document.querySelector(".fw[data-w=\\""+w+"\\"]");if(b)b.classList.toggle("off");af()}')
-L('function rf(){document.getElementById("gs").value="";document.querySelectorAll(".fb.off").forEach(b=>b.classList.remove("off"));af();showToast("Filters reset")}')
-L('function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2000)}')
-L('document.getElementById("mb").addEventListener("click",function(){const m=document.getElementById("mm");m.style.display=m.style.display==="flex"?"none":"flex"})')
+L('if(ms&&mr&&mw){cd.classList.remove("hide");v++}else{cd.classList.add("hide")}});')
+L('const el=document.querySelector(".crc-"+sid);if(el)el.textContent=v+" matching";')
+L('const em=document.getElementById("cem-"+sid);if(em)em.textContent=v===0?"No skins match your filters":""}')
+L('function ctr(sid,r){const b=document.querySelector(".cfr-"+sid+"[data-r=\'"+r+"\']");if(b){b.classList.toggle("off");cf(sid)}}')
+L('function ctw(sid,w){const b=document.querySelector(".cfw-"+sid+"[data-w=\'"+w+"\']");if(b){b.classList.toggle("off");cf(sid)}}')
+L('function crf(sid){document.getElementById("cgs-"+sid).value="";document.querySelectorAll(".cfr-"+sid+".off,.cfw-"+sid+".off").forEach(b=>b.classList.remove("off"));cf(sid)}')
+L('document.addEventListener("keydown",function(e){if(e.key==="Escape"){document.querySelectorAll(".cato.show").forEach(o=>{o.classList.remove("show");document.body.style.overflow=""})}})')
+L('document.getElementById("mb").addEventListener("click",function(){const m=document.getElementById("mm");m.style.display=m.style.display==="block"?"none":"block"});')
 L('document.querySelectorAll("#mm a").forEach(a=>a.addEventListener("click",function(){document.getElementById("mm").style.display="none"}))')
-L('const nav=document.querySelector(".nav");window.addEventListener("scroll",function(){nav.style.borderBottom=window.scrollY>64?"1px solid rgba(235,75,75,0.1)":"1px solid rgba(255,255,255,0.04)"})')
+L('window.addEventListener("scroll",function(){document.querySelector(".nv").style.borderBottom=window.scrollY>60?"1px solid rgba(235,75,75,.1)":"1px solid rgba(255,255,255,.04)"})')
 L('</script>')
 L('</body></html>')
 
@@ -288,6 +322,7 @@ outpath = os.path.join(os.path.dirname(__file__), 'index.html')
 with open(outpath, 'w') as f:
     f.write(''.join(lines))
 
-print('Done! '+str(total)+' skins')
-for sid, title, _ in categories:
-    print('  '+title+': '+str(len(cat_data[sid])))
+total_cards = sum(len(cat_data[sid]) for sid, _, _, _ in categories)
+print('Done! '+str(total_cards)+' skins across '+str(len(categories))+' categories')
+for sid, title, _, _ in categories:
+    print('  '+title+': '+str(len(cat_data[sid]))+' (showing 10)')
