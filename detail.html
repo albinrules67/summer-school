@@ -107,8 +107,9 @@ if (!skinSlug) {
     for (var e = 0; e < exteriors.length; e++) {
       (function(exterior){
         var hash = encodeURIComponent(wname+' | '+sname+' ('+exterior+')');
-        var url = 'https://steamcommunity.com/market/priceoverview/?currency=1&appid=730&market_hash_name='+hash;
-        fetch(url).then(function(r){return r.json()}).then(function(data){
+        var steamUrl = 'https://steamcommunity.com/market/priceoverview/?currency=1&appid=730&market_hash_name='+hash;
+        var proxyUrl = 'https://api.allorigins.win/raw?url='+encodeURIComponent(steamUrl);
+        fetch(proxyUrl).then(function(r){return r.json()}).then(function(data){
           var p = data.success && data.lowest_price ? data.lowest_price : '--';
           var v = data.success && data.volume ? data.volume : '--';
           var cls = exterior.replace(/ /g,'-').toLowerCase();
