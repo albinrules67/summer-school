@@ -41,7 +41,9 @@ cols = {'rifles':'#eb4b4b','pistols':'#4b69ff','smgs':'#8847ff','heavies':'#5e98
 
 def card(wn,sn,url,r):
     h = ra_hex.get(r,'#fff')
-    return f'<div class="c" data-w="{wn.lower()}" data-r="{r}" data-n="{(wn+" | "+sn).lower()}"><div class="ci"><img src="{url}" alt="{wn} {sn}" loading="lazy"><div class="ch"></div></div><div class="cb"><span style="color:{h}">{r.upper()}</span><b>{wn}</b><span>{sn}</span></div></div>'
+    slug = (wn+' '+sn).lower().replace('|','').replace('&','').replace('  ',' ').strip().replace(' ','-')
+    slug = ''.join(c for c in slug if c.isalnum() or c == '-')
+    return f'<div class="c" data-w="{wn.lower()}" data-r="{r}" data-n="{(wn+" | "+sn).lower()}" onclick="window.location=\'detail.html?skin={slug}\'" style="cursor:pointer"><div class="ci"><img src="{url}" alt="{wn} {sn}" loading="lazy"><div class="ch"></div></div><div class="cb"><span style="color:{h}">{r.upper()}</span><b>{wn}</b><span>{sn}</span></div></div>'
 
 # --- BUILD CSS ---
 css = '''<style>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CS2 Skin Vault - Detail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Inter,system-ui,sans-serif;background:#06060b;color:#c0c0cc;min-height:100vh;line-height:1.6}
+:root{--bg:#06060b;--bg2:#0c0c14;--bg3:#12121c;--fg:#c0c0cc;--fg2:#777;--r1:#eb4b4b}
+.nv{height:56px;background:var(--bg);border-bottom:1px solid rgba(255,255,255,.04);position:sticky;top:0;z-index:100}
+.nv>div{max-width:1100px;margin:0 auto;padding:0 24px;height:100%;display:flex;align-items:center;justify-content:space-between}
+.nvb{padding:7px 14px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,.06);color:var(--fg2);font-size:12px;cursor:pointer;text-decoration:none;transition:.2s;display:flex;align-items:center;gap:5px}.nvb:hover{color:#fff;border-color:rgba(255,255,255,.15)}
+.nvt{font-weight:700;color:#fff;font-size:15px}
+.mn{max-width:1100px;margin:0 auto;padding:24px}
+.dt{display:flex;gap:32px;margin-bottom:32px}
+@media(max-width:700px){.dt{flex-direction:column}}
+.di{flex:0 0 400px;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);border:1px solid rgba(255,255,255,.04);border-radius:16px;display:flex;align-items:center;justify-content:center;padding:32px}
+@media(max-width:700px){.di{flex:0 0 auto}}
+.di img{max-width:100%;max-height:320px;object-fit:contain;filter:drop-shadow(0 8px 30px rgba(0,0,0,.6))}
+.dd{flex:1;display:flex;flex-direction:column;justify-content:center}
+.ddr{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;margin-bottom:8px;width:fit-content;letter-spacing:.3px;text-transform:uppercase}
+.ddw{color:var(--fg2);font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.ddn{font-size:32px;font-weight:900;color:#fff;line-height:1.15;margin:2px 0 16px;letter-spacing:-.5px}
+.ddd{color:var(--fg2);font-size:14px;line-height:1.7;max-width:500px}
+.ddl{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.ddl a{padding:10px 20px;border-radius:8px;border:1px solid var(--r1);color:var(--r1);font-size:13px;font-weight:600;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.ddl a:hover{background:rgba(235,75,75,.08)}
+.ddl a.sm{border-color:rgba(255,255,255,.08);color:var(--fg2)}.ddl a.sm:hover{color:#fff}
+.sc{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:12px;padding:20px 24px;margin-bottom:16px}
+.sch{font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sch::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--r1)}
+.scc{color:var(--fg2);font-size:14px;line-height:1.75}
+.scc strong{color:#ddd;font-weight:600}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.card{border:1px solid rgba(255,255,255,.04);border-radius:10px;padding:16px;background:var(--bg3)}
+.card span{display:block;font-size:10px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.card strong{font-size:15px;font-weight:700;color:#fff}
+.rating{display:flex;align-items:center;gap:6px;margin-top:4px}
+.rating .stars{color:#ffb800;font-size:18px}
+.rating .num{color:#fff;font-weight:700;font-size:18px}
+.rating .votes{color:var(--fg2);font-size:12px}
+.players{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.player{padding:3px 10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);font-size:12px;color:#ddd}
+.err{text-align:center;padding:60px 20px}.err h1{font-size:24px;color:#fff;margin-bottom:8px}.err p{color:var(--fg2)}.err a{color:var(--r1)}
+.load{text-align:center;padding:60px 20px;color:var(--fg2);font-size:14px}
+</style>
+</head>
+<body>
+<nav class="nv"><div><a href="index.html" class="nvb"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m7-7l-7 7 7 7"/></svg> Back to Armory</a><div class="nvt">Skin Details</div></div></nav>
+<div class="mn" id="content"><div class="load">Loading skin details...</div></div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const skinSlug = params.get('skin');
+
+if (!skinSlug) {
+  document.getElementById('content').innerHTML = '<div class="err"><h1>No skin specified</h1><p>Go back to the <a href="index.html">armory</a> and click a skin.</p></div>';
+} else {
+  fetch('skins_detail.json')
+    .then(r => r.json())
+    .then(data => {
+      const d = data[skinSlug];
+      const [wn, sn] = skinSlug.split('-').length > 1 ? 
+        [skinSlug.split('-').slice(0, -1).join(' '), skinSlug.split('-').slice(-1).join(' ')] :
+        skinSlug.split('-');
+      
+      // Get image and rarity from skins_data
+      fetch('skins_data.json')
+        .then(r => r.json())
+        .then(sd => {
+          let img = '', wname = '', sname = '', rarity = d ? (d.rarity || '') : '';
+          for (const [w, s, u, r] of sd.all) {
+            const slug = (w + ' ' + s).toLowerCase().replace(/[|&]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+            if (slug === skinSlug) {
+              img = u; wname = w; sname = s;
+              if (!rarity) rarity = r;
+              break;
+            }
+          }
+          if (!img && d) {
+            // Try to construct image URL
+            img = 'https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou7umeldf0v73fSxB_cyJxI-fhMj-Or-Vom9u8PtziLGSrY2i2QDl8xJoYGvzINOWe1drZF_V8wPtyLvq1sNotc_NnTp9-n51pF01wh0/330x192';
+          }
+          
+          if (!img) {
+            document.getElementById('content').innerHTML = '<div class="err"><h1>Skin not found</h1><p>Could not find data for this skin. <a href="index.html">Back to armory</a></p></div>';
+            return;
+          }
+          
+          const hexCol = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0','Extraordinary':'#ffd700','Contraband':'#ffd700'}[rarity] || '#fff';
+          
+          let html = '<div class="dt"><div class="di"><img src="'+img+'" alt="'+wname+' '+sname+'"></div><div class="dd">';
+          html += '<div class="ddr" style="color:'+hexCol+';background:'+hexCol+'10;border:1px solid '+hexCol+'30">'+rarity+'</div>';
+          html += '<div class="ddw">'+wname+'</div>';
+          html += '<div class="ddn">'+sname+'</div>';
+          
+          if (d && d.description) {
+            html += '<div class="ddd">'+d.description+'</div>';
+          }
+          
+          html += '<div class="ddl">';
+          html += '<a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a>';
+          html += '<a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a>';
+          html += '</div></div></div>';
+          
+          // Detail sections
+          if (d) {
+            html += '<div class="grid2">';
+            
+            if (d.weapon) html += '<div class="card"><span>Weapon</span><strong>'+d.weapon+'</strong></div>';
+            if (d.rarity) html += '<div class="card"><span>Rarity</span><strong style="color:'+hexCol+'">'+d.rarity+'</strong></div>';
+            if (d.finish) html += '<div class="card"><span>Finish</span><strong>'+d.finish+'</strong></div>';
+            if (d.finish_style) html += '<div class="card"><span>Finish Style</span><strong>'+d.finish_style+'</strong></div>';
+            if (d.popularity) html += '<div class="card"><span>Popularity</span><strong>'+d.popularity+'</strong></div>';
+            if (d.designer) html += '<div class="card"><span>Designer</span><strong>'+d.designer+'</strong></div>';
+            if (d.released) html += '<div class="card"><span>Released</span><strong>'+d.released+'</strong></div>';
+            if (d.update) html += '<div class="card"><span>Update</span><strong>'+d.update+'</strong></div>';
+            if (d.float_min) html += '<div class="card"><span>Float Range</span><strong>'+d.float_min+' &ndash; '+d.float_max+'</strong></div>';
+            if (d.exteriors) html += '<div class="card"><span>Exteriors</span><strong>'+d.exteriors+'</strong></div>';
+            
+            html += '</div>';
+            
+            if (d.collection || d.container) {
+              html += '<div class="sc"><div class="sch">Origin</div><div class="scc">';
+              if (d.container) html += 'Obtained from <strong>'+d.container+'</strong>. ';
+              if (d.collection) {
+                html += 'Part of the <strong>'+d.collection+' Collection</strong>.';
+                if (d.collection_img) html += '<br><img src="'+d.collection_img+'" alt="'+d.collection+'" style="max-width:200px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06)">';
+              }
+              html += '</div></div>';
+            }
+            
+            if (d.rating) {
+              html += '<div class="sc"><div class="sch">Community</div><div class="scc">';
+              html += '<div class="rating"><span class="stars">★★★★★</span><span class="num">'+d.rating+'</span><span class="votes">/ 5 &bull; '+d.votes+' votes</span></div>';
+              if (d.pro_players) {
+                const players = d.pro_players.split(/[,\s]+/).filter(p => p.length > 0);
+                html += '<div style="margin-top:8px"><strong>Used by pros:</strong></div><div class="players">';
+                for (const p of players) html += '<span class="player">'+p+'</span>';
+                html += '</div>';
+              }
+              html += '</div></div>';
+            }
+          }
+          
+          document.getElementById('content').innerHTML = html;
+        })
+        .catch(() => {
+          document.getElementById('content').innerHTML = '<div class="err"><h1>Error loading data</h1><p>Could not load skin data. <a href="index.html">Back to armory</a></p></div>';
+        });
+    })
+    .catch(() => {
+      document.getElementById('content').innerHTML = '<div class="err"><h1>Error loading details</h1><p>The detail database may not be ready yet. <a href="index.html">Back to armory</a></p></div>';
+    });
+}
+</script>
+</body>
+</html>
