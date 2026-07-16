@@ -93,14 +93,19 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 .ovb{padding:7px 14px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,.06);color:var(--fg2);font-size:12px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:5px}.ovb:hover{color:#fff;border-color:rgba(255,255,255,.15)}
 .ovbt{font-weight:700;color:#fff;font-size:15px}
 .ovbc{font-size:11px;color:var(--fg2)}
-.ovf{background:var(--bg2);border-bottom:var(--bw);padding:16px 24px;display:flex;flex-direction:column;gap:10px}
-.ovfs{position:relative}
+.ovf{background:var(--bg2);border-bottom:var(--bw);padding:20px 24px;display:flex;flex-direction:column;gap:14px}
+.ovfs{position:relative;max-width:420px}
 .ovfs svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#444}
 .ovfs input{width:100%;padding:11px 14px 11px 40px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:14px;outline:none;transition:.2s}.ovfs input:focus{border-color:var(--r1)}.ovfs input::placeholder{color:#444}
-.ovff{display:flex;flex-wrap:wrap;align-items:center;gap:5px}.ovfl{font-size:10px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.4px;min-width:44px}
-.fb{padding:5px 13px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:transparent;font-size:11px;cursor:pointer;transition:.2s;font-weight:500}.fb:hover{border-color:rgba(255,255,255,.15)}.fb.off{opacity:.18;text-decoration:line-through}
-.fbl{border-color:rgba(235,75,75,.25);color:var(--r1);font-weight:600}.fbl:hover{background:rgba(235,75,75,.06)}
-.ovrc{font-size:11px;color:var(--fg2);margin-right:12px}
+.ovfg{display:flex;flex-direction:column;gap:8px}
+.ovfl{font-size:9px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.ovfr{display:flex;flex-wrap:wrap;gap:4px}
+.fb{padding:4px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02);font-size:10.5px;cursor:pointer;transition:all .2s;font-weight:500;color:#999;letter-spacing:.2px}
+.fb:hover{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#ccc}
+.fb.off{opacity:.2;text-decoration:line-through;transform:scale(.96)}
+.fbl{border-color:rgba(235,75,75,.2);color:var(--r1);font-weight:600;background:rgba(235,75,75,.04)}.fbl:hover{background:rgba(235,75,75,.1);color:#fff}
+.ovff{display:flex;align-items:center;justify-content:space-between;padding-top:4px;border-top:1px solid rgba(255,255,255,.03)}
+.ovrc{font-size:11px;color:var(--fg2)}
 .ovg{padding:24px}
 </style>'''
 # --- END CSS ---
@@ -137,17 +142,17 @@ for sid,title,icon,wp_list in categories:
     lines.append(f'<div class="ovf"><div class="ovfs"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" class="cgi" data-cat="{sid}" placeholder="Filter {title}..." oninput="cf(this)"></div>')
     
     # Rarity toggles
-    lines.append('<div class="ovff"><div class="ovfl">Rarity</div>')
+    lines.append('<div class="ovfg"><div class="ovfl">Rarity</div><div class="ovfr">')
     for rn in ['Covert','Classified','Restricted','Mil-Spec Grade','Industrial Grade','Consumer Grade']:
         ln = rn.replace('Mil-Spec Grade','Mil-Spec').replace('Industrial Grade','Industrial').replace('Consumer Grade','Consumer')
         lines.append(f'<button class="fb ocfr" data-cat="{sid}" data-r="{rn}" style="color:{ra_hex[rn]}">{ln}</button>')
-    lines.append('</div>')
+    lines.append('</div></div>')
     
     # Weapon toggles
-    lines.append('<div class="ovff"><div class="ovfl">Weapon</div>')
+    lines.append('<div class="ovfg"><div class="ovfl">Weapon</div><div class="ovfr">')
     for wl in wp_list:
         lines.append(f'<button class="fb ocfw" data-cat="{sid}" data-w="{wl}" style="font-size:10px">{wpn_disp.get(wl,wl.title())}</button>')
-    lines.append('</div>')
+    lines.append('</div></div>')
     
     # Count + Reset
     lines.append(f'<div class="ovff"><div class="ovrc" id="rc-{sid}">{tc} matching</div><button class="fb fbl" onclick="resetCat(\'{sid}\')">Reset</button></div></div>')
