@@ -72,6 +72,8 @@ if (!skinSlug) {
     html += '<div class="ddw">'+wname+'</div><div class="ddn">'+sname+'</div>';
     if (d.description) html += '<div class="ddd">'+d.description+'</div>';
     html += '<div class="ddl"><a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a><a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a></div></div></div>';
+    // Prices section
+    html += '<div class="sc" id="prices"><div class="sch">Market Prices</div><div class="scc" id="price-load" style="color:var(--fg2);font-size:12px">Loading prices...</div><div id="price-table"></div></div>';
     // Detail cards
     var fields = [['weapon_type','Weapon Type'],['rarity','Rarity'],['finish','Finish'],['finish_style','Style'],['popularity','Popularity'],['designer','Designer'],['released','Released'],['update','Update'],['float_min','Min Float'],['float_max','Max Float']];
     html += '<div class="grid2">';
@@ -98,6 +100,34 @@ if (!skinSlug) {
       html += '</div></div>';
     }
     document.getElementById('content').innerHTML = html;
+    // Fetch Steam Market prices
+    var exteriors = ['Factory New','Minimal Wear','Field-Tested','Well-Worn','Battle-Scarred'];
+    var priceHTML = '';
+    var done = 0;
+    for (var e = 0; e < exteriors.length; e++) {
+      (function(exterior){
+        var hash = encodeURIComponent(wname+' | '+sname+' ('+exterior+')');
+        var url = 'https://steamcommunity.com/market/priceoverview/?currency=1&appid=730&market_hash_name='+hash;
+        fetch(url).then(function(r){return r.json()}).then(function(data){
+          var p = data.success && data.lowest_price ? data.lowest_price : '--';
+          var v = data.success && data.volume ? data.volume : '--';
+          var cls = exterior.replace(/ /g,'-').toLowerCase();
+          var short = {'Factory New':'FN','Minimal Wear':'MW','Field-Tested':'FT','Well-Worn':'WW','Battle-Scarred':'BS'}[exterior];
+          var link = 'https://steamcommunity.com/market/listings/730/'+hash;
+          priceHTML += '<a href="'+link+'" target="_blank" class="pr" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg3);border:1px solid rgba(255,255,255,.04);border-radius:10px;text-decoration:none;color:inherit;transition:.2s"><div style="display:flex;align-items:center;gap:10px"><div style="width:28px;height:28px;border-radius:6px;background:'+hex+'15;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:'+hex+'">'+short+'</div><div><div style="font-size:12px;font-weight:600;color:#fff">'+exterior+'</div><div style="font-size:10px;color:var(--fg2)">'+v+' sold</div></div></div><div style="font-size:15px;font-weight:800;color:#fff">'+p+'</div></a>';
+          done++;
+          if (done === exteriors.length) {
+            document.getElementById('price-load').textContent = 'Prices from Steam Community Market';
+            document.getElementById('price-table').innerHTML = '<div style="display:flex;flex-direction:column;gap:8px">'+priceHTML+'</div>';
+          }
+        }).catch(function(){
+          done++;
+          if (done === exteriors.length) {
+            document.getElementById('price-load').textContent = 'Could not load prices';
+          }
+        });
+      })(exteriors[e]);
+    }
   }).catch(function(e){
     document.getElementById('content').innerHTML = '<div class="err"><h1>Error: '+e.message+'</h1><p><a href="index.html">Back to armory</a></p></div>';
   });
