@@ -1,7 +1,6 @@
 import json, re, os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib.request
-import urllib.error
 
 DATA_FILE = 'C:\\Users\\Student\\Desktop\\summer-school\\skins_data.json'
 OUT_FILE = 'C:\\Users\\Student\\Desktop\\summer-school\\skins_detail.json'
@@ -15,7 +14,6 @@ for wn, sn, url, r in data['all']:
         url = url.replace('/330x192', '')
     skins.append((wn, sn, url, r))
 
-# Remove duplicates by (wn, sn)
 seen = set()
 unique = []
 for wn, sn, url, r in skins:
@@ -30,8 +28,18 @@ def slugify(wn, sn):
     s = f'{wn} {sn}'.lower()
     s = re.sub(r'[|&]', '', s)
     s = re.sub(r'\s+', '-', s)
-    s = re.sub(r'[^a-z0-9-]', '', s)
-    return s
+    return ''.join(c for c in s if c.isalnum() or c == '-')
+
+def extract_text(html):
+    main = re.search(r'<main[^>]*>(.*?)</main>', html, re.DOTALL)
+    if not main:
+        return ''
+    text = main.group(1)
+    text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.DOTALL)
+    text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL)
+    text = re.sub(r'<[^>]+>', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+    return text
 
 def fetch_skin(wn, sn):
     slug = slugify(wn, sn)
@@ -41,141 +49,137 @@ def fetch_skin(wn, sn):
         with urllib.request.urlopen(req, timeout=10) as resp:
             html = resp.read().decode('utf-8', errors='replace')
     except Exception:
-        return None
+        return slug, None
     
-    # Extract text between <main> tags
-    main = re.search(r'<main[^>]*>(.*?)</main>', html, re.DOTALL)
-    if not main:
-        return None
-    text = main.group(1)
-    text = re.sub(r'<script[^>]*>.*?</script>', '', text, flags=re.DOTALL)
-    text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL)
-    text = re.sub(r'<[^>]+>', ' ', text)
-    text = re.sub(r'\s+', ' ', text).strip()
+    text = extract_text(html)
+    if len(text) < 500:
+        return slug, None
     
     result = {}
     
-    # Description - first paragraph
-    desc_match = re.search(r'Powerful and reliable.*?limit', text, re.IGNORECASE)
-    if not desc_match:
-        desc_match = re.search(r'(.{100,600}?)(?=\s{2,}|\s{3,})', text)
-    if desc_match:
-        result['description'] = desc_match.group(0).strip()[:500]
+    # Description - get first substantial paragraph (after weapon intro)
+    dp = re.search(r'(?:rifle|pistol|smg|shotgun|machine gun|knife|glove)[^.]+\.\s*(.{100,800})', text, re.IGNORECASE)
+    if dp:
+        desc = dp.group(1).strip()
+        if len(desc) < 30:
+            # Fallback: get any 100-600 char block
+            dp = re.search(r'(.{100,600})', text)
+            if dp: desc = dp.group(1).strip()
+        result['description'] = desc[:500]
+    else:
+        dp = re.search(r'(.{100,600})', text)
+        if dp: result['description'] = dp.group(1).strip()[:500]
+    
+    # Specific field extraction
+    patterns = {
+        'weapon': r'Weapon\s+(\S[^\n]{1,40}?)(?=\s{2,}|\s*(Finish|Rarity|Popularity|Designer|Released|Model|Pattern|Collection|Container))',
+        'finish': r'Finish\s+(\S[^\n]{1,40}?)(?=\s{2,}|\s*(Finish|Rarity|Popularity|Designer|Released|Model|Pattern|Collection|Container|Style))',
+        'finish_style': r'Finish Style\s+(\S[^\n]{1,40}?)(?=\s{2,}|\s*(Finish|Rarity|Popularity|Designer|Released|Model|Pattern|Collection|Container))',
+        'designer': r'Designer\s+([^\n]{1,40}?)(?=\s{2,}|\s*(Workshop|Released|Update|Rarity))',
+    }
+    
+    for key, pat in patterns.items():
+        m = re.search(pat, text)
+        if m:
+            result[key] = m.group(1).strip()
     
     # Rarity
-    r_match = re.search(r'Rarity\s+(Covert|Classified|Restricted|Mil-Spec|Industrial Grade|Consumer Grade|Extraordinary|Contraband)', text, re.IGNORECASE)
-    if r_match:
-        result['rarity'] = r_match.group(1)
-    
-    # Weapon
-    wp_match = re.search(r'Weapon\s+(.+)', text)
-    if wp_match:
-        result['weapon'] = wp_match.group(1).strip().split()[0]
-    
-    # Finish
-    f_match = re.search(r'Finish\s+(.+?)(?=\s{2,}|\s+Finish|\s+Pattern)', text)
-    if f_match:
-        result['finish'] = f_match.group(1).strip()
-    
-    # Finish Style
-    fs_match = re.search(r'Finish Style\s+(.+?)(?=\s{2,}|\s+Finish|\s+Pattern|\s+Model)', text)
-    if fs_match:
-        result['finish_style'] = fs_match.group(1).strip()
-    
-    # Designer
-    d_match = re.search(r'Designer\s+(.+?)(?=\s{2,}|\s+Workshop|\s+Released)', text)
-    if d_match:
-        result['designer'] = d_match.group(1).strip()
-    
-    # Released
-    rel_match = re.search(r'Released\s+(.+?)(?=\s{2,}|\s+Update)', text)
-    if rel_match:
-        result['released'] = rel_match.group(1).strip()
-    
-    # Update  
-    upd_match = re.search(r'Update\s+"([^"]+)"', text)
-    if upd_match:
-        result['update'] = upd_match.group(1)
+    m = re.search(r'(?:Rarity|Item Class Rarity)\s+(Covert|Classified|Restricted|Mil-Spec|Mil-Spec Grade|Industrial Grade|Consumer Grade|Extraordinary|Contraband)', text, re.IGNORECASE)
+    if m:
+        result['rarity'] = m.group(1)
     
     # Popularity
-    pop_match = re.search(r'Popularity\s+(\d+)%', text)
-    if pop_match:
-        result['popularity'] = pop_match.group(1) + '%'
+    m = re.search(r'Popularity\s+(\d+)%', text)
+    if m:
+        result['popularity'] = m.group(1) + '%'
+    
+    # Release date
+    m = re.search(r'Released\s+([A-Z][a-z]+ \d{1,2}[a-z]{2},? \d{4})', text)
+    if m:
+        result['released'] = m.group(1)
+    else:
+        m = re.search(r'Released\s+(\d+ \w+ \w+[\s\w]*ago)', text)
+        if m:
+            result['released'] = m.group(1)
+    
+    # Update
+    m = re.search(r'Update\s+"([^"]+)"', text)
+    if m:
+        result['update'] = m.group(1)
     
     # Collection
-    col_match = re.search(r'Collection\s+(.+?)(?:\s+\d+\s+items?)', text)
-    if col_match:
-        result['collection'] = col_match.group(1).strip()
-        # Collection image
-        ci_match = re.search(r'collections/([a-f0-9]+)\.[a-z]+', html)
-        if ci_match:
-            result['collection_img'] = f'https://cdn.csgoskins.gg/public/images/collections/{ci_match.group(1)}.png'
+    m = re.search(r'Collection\s+([A-Z][A-Za-z\s&-]+?)(?:\s+\d+\s+items?)?(?:\s{2,}|\s*\n)', text)
+    if m:
+        result['collection'] = m.group(1).strip()
+        ci = re.search(rf'{re.escape(m.group(1).strip())}.*?collections/([a-f0-9]+)\.[a-z]+', html)
+        if not ci:
+            ci = re.search(r'collections/([a-f0-9]+)\.[a-z]+', html)
+        if ci:
+            result['collection_img'] = f'https://cdn.csgoskins.gg/public/images/collections/{ci.group(1)}.png'
     
     # Container
-    cont_match = re.search(r'Containers?\s+(.+?)(?:\s{2,}|\s+Weapon Case)', text)
-    if cont_match:
-        result['container'] = cont_match.group(1).strip()
+    m = re.search(r'(?:Containers?|Obtained from)\s+([A-Z][A-Za-z\s&-]+?(?:Case|Package|Container|Collection|Box|Capsule))(?:\s|$)', text)
+    if m:
+        result['container'] = m.group(1).strip()
     
     # Float range
-    fr_match = re.search(r'float value.*?ranges from\s+([\d.]+)\s+to\s+([\d.]+)', text, re.IGNORECASE)
-    if fr_match:
-        result['float_min'] = fr_match.group(1)
-        result['float_max'] = fr_match.group(2)
+    m = re.search(r'(?:wear range|ranges from)\s+([\d.]+)\s+to\s+([\d.]+)', text, re.IGNORECASE)
+    if m:
+        result['float_min'] = m.group(1)
+        result['float_max'] = m.group(2)
     
     # Exteriors
-    ext_match = re.search(r'available in\s+(.+?)(?:\.|For each)', text, re.IGNORECASE)
-    if ext_match:
-        result['exteriors'] = ext_match.group(1).strip()
+    m = re.search(r'available in\s+(.+?)(?:\.\s|For each|$)', text, re.IGNORECASE)
+    if m:
+        result['exteriors'] = m.group(1).strip()
     
-    # Community rating
-    cr_match = re.search(r'(\d+\.?\d*)\s*out of\s*5\s*([\d.]+[KM]?)\s*Votes?', text)
-    if cr_match:
-        result['rating'] = cr_match.group(1)
-        result['votes'] = cr_match.group(2)
+    # Rating
+    m = re.search(r'(\d+\.?\d*)\s*out of\s*5\s*([\d,.]+[KM]?)\s*Votes?', text)
+    if m:
+        result['rating'] = m.group(1)
+        result['votes'] = m.group(2)
     
     # Pro players
-    pp_match = re.search(r'Professional CS2 players?\s+(.+)', text)
-    if pp_match:
-        result['pro_players'] = pp_match.group(1).strip()[:200]
+    m = re.search(r'(?:Professional CS2 players?|Used by)\s+(.+?)(?:\s{3,}|$)', text)
+    if m:
+        result['pro_players'] = m.group(1).strip()[:200]
     
-    return result
+    return slug, result if len(result) > 1 else None
 
-# Fetch in parallel
-results = {}
-done = 0
-total = len(unique)
-
-print(f"Fetching {total} skins...")
-# Load existing results if any
+# Load existing
+existing = {}
 if os.path.exists(OUT_FILE):
     with open(OUT_FILE) as f:
-        results = json.load(f)
-    print(f"Loaded {len(results)} existing results")
+        existing = json.load(f)
+    print(f"Loaded {len(existing)} existing results")
 
-to_fetch = [(wn, sn) for wn, sn, _, _ in unique if slugify(wn, sn) not in results]
-
+to_fetch = [(wn, sn) for wn, sn, _, _ in unique if slugify(wn, sn) not in existing]
 print(f"Need to fetch {len(to_fetch)} skins")
 
-with ThreadPoolExecutor(max_workers=10) as executor:
+done = 0
+total = len(to_fetch)
+batch = []
+save_every = 200
+
+with ThreadPoolExecutor(max_workers=8) as executor:
     futures = {executor.submit(fetch_skin, wn, sn): (wn, sn) for wn, sn in to_fetch}
     for future in as_completed(futures):
-        wn, sn = futures[future]
         try:
-            result = future.result()
-            slug = slugify(wn, sn)
+            slug, result = future.result()
             if result:
-                results[slug] = result
+                existing[slug] = result
             done += 1
-            if done % 100 == 0:
-                print(f"  {done}/{len(to_fetch)} ({len(results)} with data)")
-                # Save periodically
+            if done % 50 == 0:
+                print(f"  {done}/{total} ({len(existing)} with data)")
+            if done % save_every == 0:
                 with open(OUT_FILE, 'w') as f:
-                    json.dump(results, f)
+                    json.dump(existing, f)
+                print(f"  Saved {len(existing)} results")
         except Exception as e:
             done += 1
+            if done % 100 == 0: print(f"  {done}/{total} (error: {e})")
 
-# Final save
 with open(OUT_FILE, 'w') as f:
-    json.dump(results, f)
+    json.dump(existing, f)
 
-print(f"\nDone! {len(results)} skins with detail data saved to skins_detail.json")
+print(f"\nDone! {len(existing)} skins with detail data saved")
