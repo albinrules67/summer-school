@@ -69,6 +69,25 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 .gs input:focus{border-color:var(--r1)}.gs input::placeholder{color:#444}
 .gsc{text-align:center;padding:6px 0;font-size:11px;color:var(--fg2)}
 .ovg{padding:24px}
+.dm{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
+.dm.s{display:flex}
+.dmc{background:var(--bg2);border:var(--bw);border-radius:16px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto;animation:dmf .3s}@keyframes dmf{from{opacity:0;transform:translateY(20px)}}
+.dmh{position:sticky;top:0;background:var(--bg2);padding:16px 20px;border-bottom:var(--bw);display:flex;align-items:center;justify-content:space-between;z-index:2}
+.dmht{font-weight:700;color:#fff;font-size:15px}
+.dmx{padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,.08);color:var(--fg2);cursor:pointer;font-size:18px;line-height:1;transition:.2s}.dmx:hover{color:#fff}
+.dmi{background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);display:flex;align-items:center;justify-content:center;padding:24px}
+.dmi img{max-width:100%;max-height:280px;object-fit:contain;filter:drop-shadow(0 8px 24px rgba(0,0,0,.6))}
+.dmd{padding:0 20px 20px}
+.dmd b{display:block;font-size:13px;color:var(--fg2);font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.dmd h2{font-size:22px;font-weight:800;color:#fff;margin:4px 0 16px;letter-spacing:-.3px}
+.dmdc{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.dmdl{border:var(--bw);border-radius:10px;padding:12px;background:var(--bg3)}
+.dmdl span{display:block;font-size:9px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.dmdl strong{font-size:14px;font-weight:700;color:#fff}
+.dmb{display:flex;gap:8px;margin-top:16px}
+.dmb a{padding:10px 18px;border-radius:8px;border:1px solid rgba(235,75,75,.25);color:var(--r1);font-size:13px;font-weight:600;text-decoration:none;text-align:center;transition:.2s;flex:1}
+.dmb a:hover{background:rgba(235,75,75,.08)}
+.dmb .dmb2{border-color:rgba(255,255,255,.08);color:var(--fg2)}.dmb .dmb2:hover{color:#fff}
 </style>
 </head><body>
 <nav class="nv"><div><div class="nvl"><div class="nvg">CS</div><div class="nvt">Skin Vault</div><div class="nvb">COMPLETE</div></div><div class="nvr"><a href="#s-rifles">Rifles</a><a href="#s-pistols">Pistols</a><a href="#s-smgs">SMGs</a><a href="#s-heavies">Heavy</a><a href="#s-knives">Knives</a><a href="#s-gloves">Gloves</a></div></div></nav>
@@ -254,6 +273,7 @@ body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-seri
 </div>
 </div>
 <footer style="background:var(--bg2);border-top:var(--bw);padding:28px 24px;text-align:center"><p style="color:var(--fg2);font-size:11px;max-width:400px;margin:0 auto">CS2 Skin Vault &bull; Not affiliated with Valve Corporation</p></footer>
+<div class="dm" id="dm"><div class="dmc"><div class="dmh"><div class="dmht">Skin Details</div><button class="dmx" onclick="closeDetail()">&times;</button></div><div class="dmi" id="dmi"></div><div class="dmd" id="dmd"></div><div class="dmb"><a href="#" target="_blank" id="dml" class="dmb2">View on CSGOSkins.gg &nearr;</a><a href="#" target="_blank" id="dms">Steam Market &nearr;</a></div></div></div>
 <script>
 function globalFilter(){
   var s=document.getElementById("gsi").value.toLowerCase().trim();
@@ -302,7 +322,29 @@ document.addEventListener("click",function(e){
   }
 });
 document.addEventListener("keydown",function(e){
-  if(e.key==="Escape"){document.querySelectorAll(".ov.s").forEach(function(o){o.classList.remove("s");document.body.style.overflow=""})}
+  if(e.key==="Escape"){
+    document.querySelectorAll(".ov.s").forEach(function(o){o.classList.remove("s");document.body.style.overflow=""});
+    closeDetail()
+  }
+});
+function showDetail(el){
+  var wn=el.querySelector(".cb b").textContent;
+  var sn=el.querySelector(".cb span:last-child").textContent;
+  var r=el.dataset.r;
+  var img=el.querySelector("img").src;
+  var hex={'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0','Extraordinary':'#ffd700'}[r]||'#fff';
+  document.getElementById("dmi").innerHTML='<img src="'+img+'" alt="'+wn+' '+sn+'">';
+  document.getElementById("dmd").innerHTML='<b>'+wn+'</b><h2>'+sn+'</h2><div class="dmdc"><div class="dmdl"><span>Weapon</span><strong>'+wn+'</strong></div><div class="dmdl"><span>Rarity</span><strong style="color:'+hex+'">'+r+'</strong></div></div><p style="color:var(--fg2);font-size:12px;line-height:1.6">Click below to view full market details, collection info, and more on CSGOSkins.gg</p>';
+  var slug=(wn+' '+sn).toLowerCase().replace(/[|&]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  document.getElementById("dml").href='https://csgoskins.gg/items/'+slug;
+  document.getElementById("dms").href='https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wn+' | '+sn);
+  document.getElementById("dm").classList.add("s");document.body.style.overflow="hidden"
+}
+function closeDetail(){document.getElementById("dm").classList.remove("s");document.body.style.overflow=""}
+document.getElementById("dm").addEventListener("click",function(e){if(e.target===this)closeDetail()});
+document.addEventListener("click",function(e){
+  var c=e.target.closest(".c");
+  if(c&&!e.target.closest(".ov")&&!e.target.closest(".dmc")){e.preventDefault();showDetail(c)}
 });
 </script>
 </body></html>
