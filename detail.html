@@ -58,7 +58,7 @@ const skinSlug = new URLSearchParams(window.location.search).get('skin');
 if (!skinSlug) {
   document.getElementById('content').innerHTML = '<div class="err"><h1>No skin specified</h1><p>Go back to the <a href="index.html">armory</a> and click a skin.</p></div>';
 } else {
-  Promise.all([fetch('skins_data.json?v=3').then(function(r){return r.json()}), fetch('skins_detail.json?v=3').then(function(r){return r.json()})])
+  Promise.all([fetch('skins_data.json?v=1784194117').then(function(r){if(!r.ok)throw Error('data '+r.status);return r.json()}), fetch('skins_detail.json?v=1784194117').then(function(r){if(!r.ok)throw Error('detail '+r.status);return r.json()})])
     .then(function(results){
       var sd = results[0], dd = results[1];
       var d = dd[skinSlug];
