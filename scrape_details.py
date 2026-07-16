@@ -144,7 +144,7 @@ def fetch_skin(wn, sn):
     if m:
         result['pro_players'] = m.group(1).strip()[:200]
     
-    return slug, result if len(result) > 1 else None
+    return slug, result if len(result) >= 1 else None
 
 # Load existing
 existing = {}
