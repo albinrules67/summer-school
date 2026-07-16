@@ -58,68 +58,49 @@ const skinSlug = new URLSearchParams(window.location.search).get('skin');
 if (!skinSlug) {
   document.getElementById('content').innerHTML = '<div class="err"><h1>No skin specified</h1><p>Go back to the <a href="index.html">armory</a> and click a skin.</p></div>';
 } else {
-  Promise.all([fetch('skins_data.json?v=1784194117').then(function(r){if(!r.ok)throw Error('data '+r.status);return r.json()}), fetch('skins_detail.json?v=1784194117').then(function(r){if(!r.ok)throw Error('detail '+r.status);return r.json()})])
-    .then(function(results){
-      var sd = results[0], dd = results[1];
-      var d = dd[skinSlug];
-      // DEBUG
-      if (d && !window._s) { window._s = d; document.title += ' [found '+Object.keys(d).length+' keys]'; }
-      var img = '', wname = '', sname = '', rarity = d ? d.rarity : '';
-      var all = sd.all || [];
-      for (var i = 0; i < all.length; i++) {
-        var w = all[i][0], s = all[i][1], u = all[i][2], r = all[i][3];
-        var slug = (w + ' ' + s).toLowerCase().replace(/[|&]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-        if (slug === skinSlug) { img = u; wname = w; sname = s; if (!rarity) rarity = r; break; }
-      }
-      if (!img) {
-        document.getElementById('content').innerHTML = '<div class="err"><h1>Skin not found</h1><p><a href="index.html">Back to armory</a></p></div>';
-        return;
-      }
-      var hex = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0','Extraordinary':'#ffd700','Contraband':'#ffd700'}[rarity]||'#fff';
-      var html = '<div class="dt"><div class="di"><img src="'+img+'" alt="'+wname+' '+sname+'"></div><div class="dd">';
-      html += '<div class="ddr" style="color:'+hex+';background:'+hex+'10;border:1px solid '+hex+'30">'+rarity+'</div>';
-      html += '<div class="ddw">'+wname+'</div><div class="ddn">'+sname+'</div>';
-      if (d && d.description) html += '<div class="ddd">'+d.description+'</div>';
-      html += '<div class="ddl"><a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a><a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a></div></div></div>';
-      // Detail cards
-      if (d) {
-        html += '<div class="grid2">';
-        var fields = [
-          ['weapon_type','Weapon Type'],['rarity','Rarity'],['finish','Finish'],['finish_style','Style'],
-          ['popularity','Popularity'],['designer','Designer'],['released','Released'],['update','Update'],
-          ['float_min','Min Float'],['float_max','Max Float']
-        ];
-        for (var i = 0; i < fields.length; i++) {
-          var key = fields[i][0], label = fields[i][1], val = d[key];
-          if (val) {
-            var extra = key==='rarity' ? ' style="color:'+hex+'"' : '';
-            html += '<div class="card"><span>'+label+'</span><strong'+extra+'>'+val+'</strong></div>';
-          }
-        }
+  fetch('skins_detail.json?v=' + Date.now()).then(function(r){return r.json()}).then(function(dd){
+    var d = dd[skinSlug];
+    if (!d) {
+      document.getElementById('content').innerHTML = '<div class="err"><h1>Skin not found</h1><p><a href="index.html">Back to armory</a></p></div>';
+      return;
+    }
+    var img = d.image || '', wname = d.wname || '', sname = d.sname || '';
+    var rarity = d.rarity || '';
+    var hex = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0','Extraordinary':'#ffd700','Contraband':'#ffd700'}[rarity]||'#fff';
+    var html = '<div class="dt"><div class="di"><img src="'+img+'" alt="'+wname+' '+sname+'"></div><div class="dd">';
+    html += '<div class="ddr" style="color:'+hex+';background:'+hex+'10;border:1px solid '+hex+'30">'+(rarity||'')+'</div>';
+    html += '<div class="ddw">'+wname+'</div><div class="ddn">'+sname+'</div>';
+    if (d.description) html += '<div class="ddd">'+d.description+'</div>';
+    html += '<div class="ddl"><a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a><a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a></div></div></div>';
+    // Detail cards
+    var fields = [['weapon_type','Weapon Type'],['rarity','Rarity'],['finish','Finish'],['finish_style','Style'],['popularity','Popularity'],['designer','Designer'],['released','Released'],['update','Update'],['float_min','Min Float'],['float_max','Max Float']];
+    html += '<div class="grid2">';
+    for (var i = 0; i < fields.length; i++) {
+      var key = fields[i][0], label = fields[i][1], val = d[key];
+      if (val) html += '<div class="card"><span>'+label+'</span><strong'+(key==='rarity'?' style="color:'+hex+'"':'')+'>'+val+'</strong></div>';
+    }
+    html += '</div>';
+    if (d.collection || d.container) {
+      html += '<div class="sc"><div class="sch">Origin</div><div class="scc">';
+      if (d.container) html += 'Obtained from <strong>'+d.container+'</strong>. ';
+      if (d.collection) html += 'Part of the <strong>'+d.collection+'</strong>. ';
+      if (d.collection_img) html += '<br><img src="'+d.collection_img+'" alt="'+d.collection+'" style="max-width:200px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06)">';
+      html += '</div></div>';
+    }
+    if (d.rating) {
+      html += '<div class="sc"><div class="sch">Community</div><div class="scc"><div class="rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="num">'+d.rating+'</span><span class="votes">/ 5 &bull; '+d.votes+' votes</span></div>';
+      if (d.pro_players) {
+        var pl = d.pro_players.split(/[,\s]+/).filter(function(p){return p.length>0});
+        html += '<div style="margin-top:8px"><strong>Used by pros:</strong></div><div class="players">';
+        for (var p = 0; p < pl.length; p++) html += '<span class="player">'+pl[p]+'</span>';
         html += '</div>';
-        if (d.collection || d.container) {
-          html += '<div class="sc"><div class="sch">Origin</div><div class="scc">';
-          if (d.container) html += 'Obtained from <strong>'+d.container+'</strong>. ';
-          if (d.collection) html += 'Part of the <strong>'+d.collection+'</strong>. ';
-          if (d.collection_img) html += '<br><img src="'+d.collection_img+'" alt="'+d.collection+'" style="max-width:200px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06)">';
-          html += '</div></div>';
-        }
-        if (d.rating) {
-          html += '<div class="sc"><div class="sch">Community</div><div class="scc"><div class="rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="num">'+d.rating+'</span><span class="votes">/ 5 &bull; '+d.votes+' votes</span></div>';
-          if (d.pro_players) {
-            var players = d.pro_players.split(/[,\s]+/).filter(function(p){return p.length>0});
-            html += '<div style="margin-top:8px"><strong>Used by pros:</strong></div><div class="players">';
-            for (var p = 0; p < players.length; p++) html += '<span class="player">'+players[p]+'</span>';
-            html += '</div>';
-          }
-          html += '</div></div>';
-        }
       }
-      document.getElementById('content').innerHTML = html;
-    })
-    .catch(function(e){
-      document.getElementById('content').innerHTML = '<div class="err"><h1>Error loading</h1><p><a href="index.html">Back to armory</a></p></div>';
-    });
+      html += '</div></div>';
+    }
+    document.getElementById('content').innerHTML = html;
+  }).catch(function(e){
+    document.getElementById('content').innerHTML = '<div class="err"><h1>Error: '+e.message+'</h1><p><a href="index.html">Back to armory</a></p></div>';
+  });
 }
 </script>
 </body>
