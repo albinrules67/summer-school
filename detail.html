@@ -54,107 +54,69 @@ body{font-family:Inter,system-ui,sans-serif;background:#06060b;color:#c0c0cc;min
 <div class="mn" id="content"><div class="load">Loading skin details...</div></div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
-const skinSlug = params.get('skin');
-
+const skinSlug = new URLSearchParams(window.location.search).get('skin');
 if (!skinSlug) {
   document.getElementById('content').innerHTML = '<div class="err"><h1>No skin specified</h1><p>Go back to the <a href="index.html">armory</a> and click a skin.</p></div>';
 } else {
-  fetch('skins_detail.json')
-    .then(r => r.json())
-    .then(data => {
-      const d = data[skinSlug];
-      const [wn, sn] = skinSlug.split('-').length > 1 ? 
-        [skinSlug.split('-').slice(0, -1).join(' '), skinSlug.split('-').slice(-1).join(' ')] :
-        skinSlug.split('-');
-      
-      // Get image and rarity from skins_data
-      fetch('skins_data.json')
-        .then(r => r.json())
-        .then(sd => {
-          let img = '', wname = '', sname = '', rarity = d ? (d.rarity || '') : '';
-          for (const [w, s, u, r] of sd.all) {
-            const slug = (w + ' ' + s).toLowerCase().replace(/[|&]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-            if (slug === skinSlug) {
-              img = u; wname = w; sname = s;
-              if (!rarity) rarity = r;
-              break;
-            }
+  Promise.all([fetch('skins_data.json').then(r=>r.json()), fetch('skins_detail.json').then(r=>r.json())])
+    .then(function(results){
+      var sd = results[0], dd = results[1];
+      var d = dd[skinSlug];
+      var img = '', wname = '', sname = '', rarity = d ? d.rarity : '';
+      var all = sd.all || [];
+      for (var i = 0; i < all.length; i++) {
+        var w = all[i][0], s = all[i][1], u = all[i][2], r = all[i][3];
+        var slug = (w + ' ' + s).toLowerCase().replace(/[|&]/g,'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+        if (slug === skinSlug) { img = u; wname = w; sname = s; if (!rarity) rarity = r; break; }
+      }
+      if (!img) {
+        document.getElementById('content').innerHTML = '<div class="err"><h1>Skin not found</h1><p><a href="index.html">Back to armory</a></p></div>';
+        return;
+      }
+      var hex = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0','Extraordinary':'#ffd700','Contraband':'#ffd700'}[rarity]||'#fff';
+      var html = '<div class="dt"><div class="di"><img src="'+img+'" alt="'+wname+' '+sname+'"></div><div class="dd">';
+      html += '<div class="ddr" style="color:'+hex+';background:'+hex+'10;border:1px solid '+hex+'30">'+rarity+'</div>';
+      html += '<div class="ddw">'+wname+'</div><div class="ddn">'+sname+'</div>';
+      if (d && d.description) html += '<div class="ddd">'+d.description+'</div>';
+      html += '<div class="ddl"><a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a><a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a></div></div></div>';
+      // Detail cards
+      if (d) {
+        html += '<div class="grid2">';
+        var fields = [
+          ['weapon_type','Weapon Type'],['rarity','Rarity'],['finish','Finish'],['finish_style','Style'],
+          ['popularity','Popularity'],['designer','Designer'],['released','Released'],['update','Update'],
+          ['float_min','Min Float'],['float_max','Max Float']
+        ];
+        for (var i = 0; i < fields.length; i++) {
+          var key = fields[i][0], label = fields[i][1], val = d[key];
+          if (val) {
+            var extra = key==='rarity' ? ' style="color:'+hex+'"' : '';
+            html += '<div class="card"><span>'+label+'</span><strong'+extra+'>'+val+'</strong></div>';
           }
-          if (!img && d) {
-            // Try to construct image URL
-            img = 'https://community.akamai.steamstatic.com/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou7umeldf0v73fSxB_cyJxI-fhMj-Or-Vom9u8PtziLGSrY2i2QDl8xJoYGvzINOWe1drZF_V8wPtyLvq1sNotc_NnTp9-n51pF01wh0/330x192';
-          }
-          
-          if (!img) {
-            document.getElementById('content').innerHTML = '<div class="err"><h1>Skin not found</h1><p>Could not find data for this skin. <a href="index.html">Back to armory</a></p></div>';
-            return;
-          }
-          
-          const hexCol = {'Covert':'#eb4b4b','Classified':'#d32ce6','Restricted':'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0','Extraordinary':'#ffd700','Contraband':'#ffd700'}[rarity] || '#fff';
-          
-          let html = '<div class="dt"><div class="di"><img src="'+img+'" alt="'+wname+' '+sname+'"></div><div class="dd">';
-          html += '<div class="ddr" style="color:'+hexCol+';background:'+hexCol+'10;border:1px solid '+hexCol+'30">'+rarity+'</div>';
-          html += '<div class="ddw">'+wname+'</div>';
-          html += '<div class="ddn">'+sname+'</div>';
-          
-          if (d && d.description) {
-            html += '<div class="ddd">'+d.description+'</div>';
-          }
-          
-          html += '<div class="ddl">';
-          html += '<a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a>';
-          html += '<a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a>';
-          html += '</div></div></div>';
-          
-          // Detail sections
-          if (d) {
-            html += '<div class="grid2">';
-            
-            if (d.weapon) html += '<div class="card"><span>Weapon</span><strong>'+d.weapon+'</strong></div>';
-            if (d.rarity) html += '<div class="card"><span>Rarity</span><strong style="color:'+hexCol+'">'+d.rarity+'</strong></div>';
-            if (d.finish) html += '<div class="card"><span>Finish</span><strong>'+d.finish+'</strong></div>';
-            if (d.finish_style) html += '<div class="card"><span>Finish Style</span><strong>'+d.finish_style+'</strong></div>';
-            if (d.popularity) html += '<div class="card"><span>Popularity</span><strong>'+d.popularity+'</strong></div>';
-            if (d.designer) html += '<div class="card"><span>Designer</span><strong>'+d.designer+'</strong></div>';
-            if (d.released) html += '<div class="card"><span>Released</span><strong>'+d.released+'</strong></div>';
-            if (d.update) html += '<div class="card"><span>Update</span><strong>'+d.update+'</strong></div>';
-            if (d.float_min) html += '<div class="card"><span>Float Range</span><strong>'+d.float_min+' &ndash; '+d.float_max+'</strong></div>';
-            if (d.exteriors) html += '<div class="card"><span>Exteriors</span><strong>'+d.exteriors+'</strong></div>';
-            
+        }
+        html += '</div>';
+        if (d.collection || d.container) {
+          html += '<div class="sc"><div class="sch">Origin</div><div class="scc">';
+          if (d.container) html += 'Obtained from <strong>'+d.container+'</strong>. ';
+          if (d.collection) html += 'Part of the <strong>'+d.collection+'</strong>. ';
+          if (d.collection_img) html += '<br><img src="'+d.collection_img+'" alt="'+d.collection+'" style="max-width:200px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06)">';
+          html += '</div></div>';
+        }
+        if (d.rating) {
+          html += '<div class="sc"><div class="sch">Community</div><div class="scc"><div class="rating"><span class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span><span class="num">'+d.rating+'</span><span class="votes">/ 5 &bull; '+d.votes+' votes</span></div>';
+          if (d.pro_players) {
+            var players = d.pro_players.split(/[,\s]+/).filter(function(p){return p.length>0});
+            html += '<div style="margin-top:8px"><strong>Used by pros:</strong></div><div class="players">';
+            for (var p = 0; p < players.length; p++) html += '<span class="player">'+players[p]+'</span>';
             html += '</div>';
-            
-            if (d.collection || d.container) {
-              html += '<div class="sc"><div class="sch">Origin</div><div class="scc">';
-              if (d.container) html += 'Obtained from <strong>'+d.container+'</strong>. ';
-              if (d.collection) {
-                html += 'Part of the <strong>'+d.collection+' Collection</strong>.';
-                if (d.collection_img) html += '<br><img src="'+d.collection_img+'" alt="'+d.collection+'" style="max-width:200px;margin-top:8px;border-radius:8px;border:1px solid rgba(255,255,255,.06)">';
-              }
-              html += '</div></div>';
-            }
-            
-            if (d.rating) {
-              html += '<div class="sc"><div class="sch">Community</div><div class="scc">';
-              html += '<div class="rating"><span class="stars">★★★★★</span><span class="num">'+d.rating+'</span><span class="votes">/ 5 &bull; '+d.votes+' votes</span></div>';
-              if (d.pro_players) {
-                const players = d.pro_players.split(/[,\s]+/).filter(p => p.length > 0);
-                html += '<div style="margin-top:8px"><strong>Used by pros:</strong></div><div class="players">';
-                for (const p of players) html += '<span class="player">'+p+'</span>';
-                html += '</div>';
-              }
-              html += '</div></div>';
-            }
           }
-          
-          document.getElementById('content').innerHTML = html;
-        })
-        .catch(() => {
-          document.getElementById('content').innerHTML = '<div class="err"><h1>Error loading data</h1><p>Could not load skin data. <a href="index.html">Back to armory</a></p></div>';
-        });
+          html += '</div></div>';
+        }
+      }
+      document.getElementById('content').innerHTML = html;
     })
-    .catch(() => {
-      document.getElementById('content').innerHTML = '<div class="err"><h1>Error loading details</h1><p>The detail database may not be ready yet. <a href="index.html">Back to armory</a></p></div>';
+    .catch(function(e){
+      document.getElementById('content').innerHTML = '<div class="err"><h1>Error loading</h1><p><a href="index.html">Back to armory</a></p></div>';
     });
 }
 </script>
