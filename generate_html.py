@@ -55,7 +55,7 @@ lines.append(css)
 lines.append('</head><body>')
 
 # NAV
-lines.append('<nav class="nv"><div><div class="nvl"><div class="nvg">CS</div><div class="nvt">Skin Vault</div><div class="nvb">COMPLETE</div></div><div class="nvr"><a href="#s-rifles">Rifles</a><a href="#s-pistols">Pistols</a><a href="#s-smgs">SMGs</a><a href="#s-heavies">Heavy</a><a href="#s-knives">Knives</a><a href="#s-gloves">Gloves</a></div></div></nav>')
+lines.append('<nav class="nv"><div><div class="nvl"><div class="nvg">CS</div><div class="nvt">Skin Vault</div><div class="nvb">COMPLETE</div></div><div class="nvr"><a href="#s-rifles">Rifles</a><a href="#s-pistols">Pistols</a><a href="#s-smgs">SMGs</a><a href="#s-heavies">Heavy</a><a href="#s-knives">Knives</a><a href="#s-gloves">Gloves</a><a href="tradeup.html" style="color:var(--r7);font-weight:700">🔀 Trade Up</a></div></div></nav>')
 
 # HERO
 lines.append(f'<div class="hr"><div class="hri"><div class="hrt"><span></span>Complete Armory &bull; {t} finishes</div><h1 class="hrh">CS2 <em>Skin Vault</em></h1><p class="hrp">Browse 10 featured skins per category, or dive into the full catalog with search and filters.</p></div></div>')

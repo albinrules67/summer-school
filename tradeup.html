@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CS2 Trade Up Calculator — Skin Vault</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#05050a;color:#c8c8d4;min-height:100vh;line-height:1.5}
+:root{--bg:#05050a;--bg2:#0b0b14;--bg3:#10101c;--bg4:#161628;--fg:#c8c8d4;--fg2:#7777a0;--r1:#eb4b4b}
+.nv{height:56px;background:rgba(5,5,10,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04);position:sticky;top:0;z-index:100;display:flex;align-items:center;padding:0 24px}
+.nv a{padding:7px 14px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,.06);color:var(--fg2);font-size:12px;text-decoration:none;transition:.2s;display:flex;align-items:center;gap:5px;font-weight:500}
+.nv a:hover{color:#fff;border-color:var(--r1)}
+.mn{max-width:800px;margin:0 auto;padding:32px 24px}
+h1{font-family:Orbitron,sans-serif;font-size:28px;font-weight:900;color:#fff;margin-bottom:4px}
+.sub{color:var(--fg2);font-size:13px;margin-bottom:28px}
+.card{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:20px 24px;margin-bottom:16px}
+.card h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.3px}
+.card h3::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--r1)}
+.float-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+@media(max-width:600px){.float-inputs{grid-template-columns:repeat(2,1fr)}}
+.fi input{width:100%;padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:13px;text-align:center;outline:none;transition:.2s;font-family:monospace}
+.fi input:focus{border-color:var(--r1);box-shadow:0 0 0 3px rgba(255,59,59,.06)}
+.fi label{display:block;text-align:center;font-size:10px;color:var(--fg2);margin-bottom:4px;font-weight:600}
+.quick-fills{display:flex;gap:6px;flex-wrap:wrap}
+.qf{padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:transparent;font-size:10px;color:var(--fg2);cursor:pointer;transition:.2s}
+.qf:hover{border-color:var(--r1);color:var(--r1)}
+.result{text-align:center;padding:20px 0;display:none}
+.result.show{display:block}
+.result .big{font-family:Orbitron,sans-serif;font-size:32px;font-weight:900;margin:8px 0}
+.result .big.green{color:#4ade80}.result .big.blue{color:#60a5fa}.result .big.yellow{color:#fbbf24}.result .big.orange{color:#fb923c}.result .big.red{color:#ef4444}
+.result .label{font-size:11px;color:var(--fg2);text-transform:uppercase;letter-spacing:.3px}
+.result .ext{display:inline-block;padding:4px 12px;border-radius:12px;font-weight:700;font-size:12px;margin:8px 0}
+.result .ext.fn{background:#4ade8020;color:#4ade80;border:1px solid #4ade8030}
+.result .ext.mw{background:#60a5fa20;color:#60a5fa;border:1px solid #60a5fa30}
+.result .ext.ft{background:#fbbf2420;color:#fbbf24;border:1px solid #fbbf2430}
+.result .ext.ww{background:#fb923c20;color:#fb923c;border:1px solid #fb923c30}
+.result .ext.bs{background:#ef444420;color:#ef4444;border:1px solid #ef444430}
+.info{font-size:11px;color:var(--fg2);margin-top:12px;line-height:1.6}
+.info strong{color:#ddd}
+.avg-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.04);margin-top:8px}
+.avg-row span{font-size:12px;color:var(--fg2);font-weight:500}
+.avg-row strong{font-size:14px;color:#fff;font-family:monospace}
+</style>
+</head>
+<body>
+<nav class="nv"><a href="index.html">← Back to Armory</a></nav>
+<div class="mn">
+<h1>🔀 Trade Up Calculator</h1>
+<p class="sub">Input 10 skin float values to calculate your CS2 trade-up outcome</p>
+
+<div class="card">
+  <h3>Input: 10 Float Values</h3>
+  <div class="float-inputs" id="floatInputs"></div>
+  <div class="quick-fills">
+    <button class="qf" onclick="fillAll(0.01)">All FN (0.01)</button>
+    <button class="qf" onclick="fillAll(0.10)">All MW (0.10)</button>
+    <button class="qf" onclick="fillAll(0.25)">All FT (0.25)</button>
+    <button class="qf" onclick="fillAll(0.40)">All WW (0.40)</button>
+    <button class="qf" onclick="fillAll(0.60)">All BS (0.60)</button>
+    <button class="qf" onclick="randomizeFloats()">Random</button>
+    <button class="qf" onclick="clearAll()">Clear</button>
+  </div>
+  <div class="avg-row" id="avgRow" style="display:none">
+    <span>Average Float:</span>
+    <strong id="avgFloat">—</strong>
+  </div>
+  <div class="avg-row">
+    <span>Target Exterior:</span>
+    <select id="targetExt" onchange="calculate()" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:12px;outline:none;font-family:system-ui">
+      <option value="">Auto-detect</option>
+      <option value="fn">Factory New (0.00–0.07)</option>
+      <option value="mw">Minimal Wear (0.07–0.15)</option>
+      <option value="ft">Field-Tested (0.15–0.38)</option>
+      <option value="ww">Well-Worn (0.38–0.45)</option>
+      <option value="bs">Battle-Scarred (0.45–1.00)</option>
+    </select>
+  </div>
+  <div class="avg-row">
+    <span>Output Skin Float Range:</span>
+    <div style="display:flex;gap:6px;align-items:center">
+      <input type="number" step="0.000001" min="0" max="1" id="minFloat" placeholder="Min" oninput="calculate()" style="width:80px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:12px;text-align:right;font-family:monospace;outline:none">
+      <span style="color:var(--fg2)">—</span>
+      <input type="number" step="0.000001" min="0" max="1" id="maxFloat" placeholder="Max" oninput="calculate()" style="width:80px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:12px;text-align:right;font-family:monospace;outline:none">
+    </div>
+  </div>
+</div>
+
+<div class="result" id="result">
+  <div class="label">Expected Output Float</div>
+  <div class="big" id="outputFloat">—</div>
+  <div class="ext" id="outputExt" style="display:none"></div>
+  <div class="info" id="outputInfo"></div>
+</div>
+
+<div class="card">
+  <h3>How It Works</h3>
+  <div class="info">
+    <p><strong>Formula:</strong> Output Float = (avg of 10 inputs) × (max − min) + min</p>
+    <br>
+    <p><strong>Exterior ranges:</strong> FN 0.00–0.07 | MW 0.07–0.15 | FT 0.15–0.38 | WW 0.38–0.45 | BS 0.45–1.00</p>
+    <br>
+    <p><strong>Rarity rule:</strong> Output = 1 tier above your 10 inputs (e.g. 10 Mil-Spec → 1 Restricted). Cannot trade up beyond Covert. No StatTrak → Non-StatTrak, and vice versa.</p>
+  </div>
+</div>
+</div>
+
+<script>
+for (var i = 1; i <= 10; i++) {
+  document.getElementById('floatInputs').innerHTML += '<div class="fi"><label>Skin #'+i+'</label><input type="number" step="0.000001" min="0" max="1" id="f'+(i-1)+'" placeholder="0.00" oninput="calculate()"></div>';
+}
+
+function getFloats() {
+  var vals = [];
+  for (var i = 0; i < 10; i++) {
+    var el = document.getElementById('f'+i);
+    var v = parseFloat(el.value);
+    if (isNaN(v) || v < 0 || v > 1) return null;
+    vals.push(v);
+  }
+  return vals;
+}
+
+function calculate() {
+  var vals = getFloats();
+  if (!vals) {
+    document.getElementById('avgRow').style.display = 'none';
+    document.getElementById('result').classList.remove('show');
+    return;
+  }
+  var sum = 0; for (var i=0;i<vals.length;i++) sum+=vals[i];
+  var avg = sum/vals.length;
+  document.getElementById('avgRow').style.display = 'flex';
+  document.getElementById('avgFloat').textContent = avg.toFixed(6);
+  
+  var minF = parseFloat(document.getElementById('minFloat').value) || 0;
+  var maxF = parseFloat(document.getElementById('maxFloat').value) || 1;
+  var outputFloat = avg * (maxF - minF) + minF;
+  
+  var targetExt = document.getElementById('targetExt').value;
+  var ranges = {fn:[0,0.07], mw:[0.07,0.15], ft:[0.15,0.38], ww:[0.38,0.45], bs:[0.45,1.0]};
+  if (targetExt && ranges[targetExt]) {
+    var r = ranges[targetExt];
+    outputFloat = Math.max(r[0], Math.min(r[1], outputFloat));
+  }
+  
+  var ext, extClass, color;
+  if (outputFloat < 0.07) { ext='Factory New'; extClass='fn'; color='green'; }
+  else if (outputFloat < 0.15) { ext='Minimal Wear'; extClass='mw'; color='blue'; }
+  else if (outputFloat < 0.38) { ext='Field-Tested'; extClass='ft'; color='yellow'; }
+  else if (outputFloat < 0.45) { ext='Well-Worn'; extClass='ww'; color='orange'; }
+  else { ext='Battle-Scarred'; extClass='bs'; color='red'; }
+  
+  document.getElementById('result').classList.add('show');
+  document.getElementById('outputFloat').textContent = outputFloat.toFixed(8);
+  document.getElementById('outputFloat').className = 'big '+color;
+  document.getElementById('outputExt').style.display = 'inline-block';
+  document.getElementById('outputExt').className = 'ext '+extClass;
+  document.getElementById('outputExt').textContent = ext;
+  document.getElementById('outputInfo').innerHTML = '<strong>Avg input:</strong> '+avg.toFixed(6)+' &bull; <strong>Formula:</strong> '+avg.toFixed(6)+' × ('+maxF.toFixed(4)+' − '+minF.toFixed(4)+') + '+minF.toFixed(4)+' = <strong>'+outputFloat.toFixed(8)+'</strong>';
+}
+
+function fillAll(val) { for(var i=0;i<10;i++) document.getElementById('f'+i).value=val; calculate(); }
+function randomizeFloats() { for(var i=0;i<10;i++) document.getElementById('f'+i).value=(Math.random()*0.8+0.01).toFixed(6); calculate(); }
+function clearAll() { for(var i=0;i<10;i++) document.getElementById('f'+i).value=''; document.getElementById('avgRow').style.display='none'; document.getElementById('result').classList.remove('show'); }
+fillAll(0.05);
+</script>
+</body>
+</html>
