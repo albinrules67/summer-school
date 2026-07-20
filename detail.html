@@ -71,7 +71,7 @@ if (!skinSlug) {
     html += '<div class="ddr" style="color:'+hex+';background:'+hex+'10;border:1px solid '+hex+'30">'+(rarity||'')+'</div>';
     html += '<div class="ddw">'+wname+'</div><div class="ddn">'+sname+'</div>';
     if (d.description) html += '<div class="ddd">'+d.description+'</div>';
-    html += '<div class="ddl"><a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">View on CSGOSkins.gg &nearr;</a><a class="sm" href="https://steamcommunity.com/market/listings/730/'+encodeURIComponent(wname+' | '+sname)+'" target="_blank">Steam Market &nearr;</a></div></div></div>';
+    html += '<div class="ddl"><a href="https://csgoskins.gg/items/'+skinSlug+'" target="_blank">CSGOSkins.gg &nearr;</a><a class="sm" href="https://cs.money/csgo/trade/buy/?search='+encodeURIComponent(wname+' '+sname)+'" target="_blank">CS.Money &nearr;</a><a class="sm" href="https://skinport.com/market?search='+encodeURIComponent(wname+' '+sname)+'" target="_blank">Skinport &nearr;</a></div></div></div>';
     // Prices section
     html += '<div class="sc" id="prices"><div class="sch">Market Prices</div><div class="scc" id="price-load" style="color:var(--fg2);font-size:12px">Loading prices...</div><div id="price-table"></div></div>';
     // Detail cards
