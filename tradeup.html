@@ -3,114 +3,228 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>CS2 Trade Up Calculator — Skin Vault</title>
+<title>CS2 Trade-Up Calculator — Skin Vault</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,sans-serif;background:#05050a;color:#c8c8d4;min-height:100vh;line-height:1.5}
-:root{--bg:#05050a;--bg2:#0b0b14;--bg3:#10101c;--bg4:#161628;--fg:#c8c8d4;--fg2:#7777a0;--r1:#eb4b4b}
+:root{--bg:#05050a;--bg2:#0b0b14;--bg3:#10101c;--bg4:#161628;--fg:#c8c8d4;--fg2:#7777a0;--r1:#eb4b4b;--r7:#ffd700}
 .nv{height:56px;background:rgba(5,5,10,.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.04);position:sticky;top:0;z-index:100;display:flex;align-items:center;padding:0 24px}
 .nv a{padding:7px 14px;border-radius:8px;background:var(--bg3);border:1px solid rgba(255,255,255,.06);color:var(--fg2);font-size:12px;text-decoration:none;transition:.2s;display:flex;align-items:center;gap:5px;font-weight:500}
 .nv a:hover{color:#fff;border-color:var(--r1)}
-.mn{max-width:800px;margin:0 auto;padding:32px 24px}
-h1{font-family:Orbitron,sans-serif;font-size:28px;font-weight:900;color:#fff;margin-bottom:4px}
-.sub{color:var(--fg2);font-size:13px;margin-bottom:28px}
+.mn{max-width:900px;margin:0 auto;padding:24px 20px}
+h1{font-family:Orbitron,sans-serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:4px}
+.sub{color:var(--fg2);font-size:13px;margin-bottom:24px}
 .card{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:14px;padding:20px 24px;margin-bottom:16px}
-.card h3{font-size:14px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.3px}
-.card h3::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--r1)}
-.float-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
-@media(max-width:600px){.float-inputs{grid-template-columns:repeat(2,1fr)}}
-.fi input{width:100%;padding:10px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:13px;text-align:center;outline:none;transition:.2s;font-family:monospace}
-.fi input:focus{border-color:var(--r1);box-shadow:0 0 0 3px rgba(255,59,59,.06)}
-.fi label{display:block;text-align:center;font-size:10px;color:var(--fg2);margin-bottom:4px;font-weight:600}
-.quick-fills{display:flex;gap:6px;flex-wrap:wrap}
-.qf{padding:4px 10px;border-radius:12px;border:1px solid rgba(255,255,255,.06);background:transparent;font-size:10px;color:var(--fg2);cursor:pointer;transition:.2s}
+.card h3{font-size:13px;font-weight:700;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px}
+.card h3::before{content:"";width:3px;height:14px;border-radius:2px;background:var(--r1)}
+.rarity_fl{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.rb{padding:6px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.06);background:transparent;font-size:10px;font-weight:600;cursor:pointer;transition:.2s;color:#999;text-transform:uppercase}
+.rb:hover{border-color:rgba(255,255,255,.15);color:#ddd}
+.rb.sel{border-color:var(--r1);color:var(--r1);background:rgba(235,75,75,.06)}
+.search_wrap{position:relative;margin-bottom:12px}
+.search_wrap input{width:100%;padding:12px 14px 12px 40px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:14px;outline:none;transition:.2s}
+.search_wrap input:focus{border-color:var(--r1)}.search_wrap input::placeholder{color:#555}
+.search_wrap svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#555}
+.dropdown{max-height:300px;overflow-y:auto;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:var(--bg3);display:none;margin-top:4px}
+.dropdown.show{display:block}
+.dropdown .opt{padding:10px 14px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.03)}
+.dropdown .opt:hover{background:rgba(235,75,75,.06)}
+.dropdown .opt img{width:40px;height:30px;object-fit:contain}
+.dropdown .opt .info{flex:1}
+.dropdown .opt .name{font-size:12px;font-weight:600;color:#fff}
+.dropdown .opt .wep{font-size:10px;color:var(--fg2)}
+.dropdown .opt .rar{font-size:9px;font-weight:700;padding:2px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.3px}
+.selected{background:var(--bg3);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:12px 14px;display:none;align-items:center;gap:12px;margin-bottom:12px}
+.selected.show{display:flex}
+.selected img{width:50px;height:38px;object-fit:contain}
+.selected .info{flex:1}
+.selected .name{font-size:13px;font-weight:700;color:#fff}
+.selected .meta{font-size:11px;color:var(--fg2);margin-top:2px}
+.selected .remove{padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--fg2);cursor:pointer;font-size:11px;transition:.2s}
+.selected .remove:hover{color:#ff3b3b;border-color:#ff3b3b}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.float-inputs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:10px}
+@media(max-width:500px){.float-inputs{grid-template-columns:repeat(2,1fr)}}
+.fi input{width:100%;padding:9px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:13px;text-align:center;outline:none;transition:.2s;font-family:monospace}
+.fi input:focus{border-color:var(--r1);box-shadow:0 0 0 3px rgba(235,75,75,.06)}
+.fi label{display:block;text-align:center;font-size:9px;color:var(--fg2);margin-bottom:3px;font-weight:600;text-transform:uppercase}
+.quick-fills{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.qf{padding:4px 9px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:transparent;font-size:10px;color:var(--fg2);cursor:pointer;transition:.2s}
 .qf:hover{border-color:var(--r1);color:var(--r1)}
-.result{text-align:center;padding:20px 0;display:none}
-.result.show{display:block}
-.result .big{font-family:Orbitron,sans-serif;font-size:32px;font-weight:900;margin:8px 0}
-.result .big.green{color:#4ade80}.result .big.blue{color:#60a5fa}.result .big.yellow{color:#fbbf24}.result .big.orange{color:#fb923c}.result .big.red{color:#ef4444}
-.result .label{font-size:11px;color:var(--fg2);text-transform:uppercase;letter-spacing:.3px}
-.result .ext{display:inline-block;padding:4px 12px;border-radius:12px;font-weight:700;font-size:12px;margin:8px 0}
-.result .ext.fn{background:#4ade8020;color:#4ade80;border:1px solid #4ade8030}
-.result .ext.mw{background:#60a5fa20;color:#60a5fa;border:1px solid #60a5fa30}
-.result .ext.ft{background:#fbbf2420;color:#fbbf24;border:1px solid #fbbf2430}
-.result .ext.ww{background:#fb923c20;color:#fb923c;border:1px solid #fb923c30}
-.result .ext.bs{background:#ef444420;color:#ef4444;border:1px solid #ef444430}
-.info{font-size:11px;color:var(--fg2);margin-top:12px;line-height:1.6}
-.info strong{color:#ddd}
 .avg-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:1px solid rgba(255,255,255,.04);margin-top:8px}
-.avg-row span{font-size:12px;color:var(--fg2);font-weight:500}
+.avg-row span{font-size:11px;color:var(--fg2);font-weight:500}
 .avg-row strong{font-size:14px;color:#fff;font-family:monospace}
+.result{padding:16px 0 0;text-align:center}
+.result .big{font-family:Orbitron,sans-serif;font-size:30px;font-weight:900;margin:6px 0}
+.result .big.green{color:#4ade80}.result .big.blue{color:#60a5fa}.result .big.yellow{color:#fbbf24}.result .big.orange{color:#fb923c}.result .big.red{color:#ef4444}.result .big.magenta{color:#e879f9}
+.result .label{font-size:10px;color:var(--fg2);text-transform:uppercase;letter-spacing:.5px}
+.result .ext{display:inline-block;padding:4px 14px;border-radius:12px;font-weight:700;font-size:11px;margin:6px 0;text-transform:uppercase}
+.result .ext.fn{background:#4ade8018;color:#4ade80;border:1px solid #4ade8030}
+.result .ext.mw{background:#60a5fa18;color:#60a5fa;border:1px solid #60a5fa30}
+.result .ext.ft{background:#fbbf2418;color:#fbbf24;border:1px solid #fbbf2430}
+.result .ext.ww{background:#fb923c18;color:#fb923c;border:1px solid #fb923c30}
+.result .ext.bs{background:#ef444418;color:#ef4444;border:1px solid #ef444430}
+.info{font-size:11px;color:var(--fg2);margin-top:10px;line-height:1.7}
+.info strong{color:#ddd}
+.hint{font-size:11px;color:#555;text-align:center;padding:10px 0}
 </style>
 </head>
 <body>
 <nav class="nv"><a href="index.html">← Back to Armory</a></nav>
 <div class="mn">
-<h1>🔀 Trade Up Calculator</h1>
-<p class="sub">Input 10 skin float values to calculate your CS2 trade-up outcome</p>
+<h1>🔀 Trade-Up Calculator</h1>
+<p class="sub">Select your desired output skin, then enter 10 input float values</p>
 
+<div class="grid2">
+<div>
 <div class="card">
-  <h3>Input: 10 Float Values</h3>
+  <h3>1. Choose Output Skin</h3>
+  <div class="rarity_fl" id="rarityBtns"></div>
+  <div class="search_wrap"><svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg><input type="text" id="skinSearch" placeholder="Search for output skin... (e.g. AK-47 Redline)" oninput="searchSkins(this.value)" onfocus="searchSkins(this.value)"></div>
+  <div class="dropdown" id="dropdown"></div>
+  <div class="selected" id="selected"></div>
+  <div id="selectedInfo" style="display:none">
+    <div class="avg-row"><span>Float Range</span><strong id="floatRange">—</strong></div>
+    <div class="avg-row"><span>Rarity</span><strong id="outRarity">—</strong></div>
+  </div>
+</div>
+</div>
+
+<div>
+<div class="card">
+  <h3>2. Enter 10 Input Floats</h3>
   <div class="float-inputs" id="floatInputs"></div>
   <div class="quick-fills">
-    <button class="qf" onclick="fillAll(0.01)">All FN (0.01)</button>
-    <button class="qf" onclick="fillAll(0.10)">All MW (0.10)</button>
-    <button class="qf" onclick="fillAll(0.25)">All FT (0.25)</button>
-    <button class="qf" onclick="fillAll(0.40)">All WW (0.40)</button>
-    <button class="qf" onclick="fillAll(0.60)">All BS (0.60)</button>
-    <button class="qf" onclick="randomizeFloats()">Random</button>
+    <button class="qf" onclick="fillAll(0.01)">FN (0.01)</button>
+    <button class="qf" onclick="fillAll(0.10)">MW (0.10)</button>
+    <button class="qf" onclick="fillAll(0.25)">FT (0.25)</button>
+    <button class="qf" onclick="fillAll(0.40)">WW (0.40)</button>
+    <button class="qf" onclick="fillAll(0.60)">BS (0.60)</button>
+    <button class="qf" onclick="randomize()">Random</button>
     <button class="qf" onclick="clearAll()">Clear</button>
   </div>
   <div class="avg-row" id="avgRow" style="display:none">
-    <span>Average Float:</span>
+    <span>Average Float</span>
     <strong id="avgFloat">—</strong>
   </div>
-  <div class="avg-row">
-    <span>Target Exterior:</span>
-    <select id="targetExt" onchange="calculate()" style="padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:12px;outline:none;font-family:system-ui">
-      <option value="">Auto-detect</option>
-      <option value="fn">Factory New (0.00–0.07)</option>
-      <option value="mw">Minimal Wear (0.07–0.15)</option>
-      <option value="ft">Field-Tested (0.15–0.38)</option>
-      <option value="ww">Well-Worn (0.38–0.45)</option>
-      <option value="bs">Battle-Scarred (0.45–1.00)</option>
-    </select>
-  </div>
-  <div class="avg-row">
-    <span>Output Skin Float Range:</span>
-    <div style="display:flex;gap:6px;align-items:center">
-      <input type="number" step="0.000001" min="0" max="1" id="minFloat" placeholder="Min" oninput="calculate()" style="width:80px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:12px;text-align:right;font-family:monospace;outline:none">
-      <span style="color:var(--fg2)">—</span>
-      <input type="number" step="0.000001" min="0" max="1" id="maxFloat" placeholder="Max" oninput="calculate()" style="width:80px;padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:var(--bg3);color:#fff;font-size:12px;text-align:right;font-family:monospace;outline:none">
-    </div>
+
+  <div class="result" id="result" style="display:none">
+    <div class="label">Expected Output</div>
+    <div class="big" id="outputFloat">—</div>
+    <div class="ext" id="outputExt" style="display:none"></div>
+    <div class="info" id="outputInfo"></div>
   </div>
 </div>
-
-<div class="result" id="result">
-  <div class="label">Expected Output Float</div>
-  <div class="big" id="outputFloat">—</div>
-  <div class="ext" id="outputExt" style="display:none"></div>
-  <div class="info" id="outputInfo"></div>
+</div>
 </div>
 
 <div class="card">
-  <h3>How It Works</h3>
+  <h3>Formula</h3>
   <div class="info">
-    <p><strong>Formula:</strong> Output Float = (avg of 10 inputs) × (max − min) + min</p>
-    <br>
-    <p><strong>Exterior ranges:</strong> FN 0.00–0.07 | MW 0.07–0.15 | FT 0.15–0.38 | WW 0.38–0.45 | BS 0.45–1.00</p>
-    <br>
-    <p><strong>Rarity rule:</strong> Output = 1 tier above your 10 inputs (e.g. 10 Mil-Spec → 1 Restricted). Cannot trade up beyond Covert. No StatTrak → Non-StatTrak, and vice versa.</p>
+    <strong>Output = avg(10 inputs) × (max_float − min_float) + min_float</strong><br>
+    The output's float range determines the available exteriors. 10 skins of one rarity produce 1 skin of the next tier up.
   </div>
 </div>
 </div>
 
 <script>
-for (var i = 1; i <= 10; i++) {
-  document.getElementById('floatInputs').innerHTML += '<div class="fi"><label>Skin #'+i+'</label><input type="number" step="0.000001" min="0" max="1" id="f'+(i-1)+'" placeholder="0.00" oninput="calculate()"></div>';
+var SKINS = [];
+var selectedSkin = null;
+var rarityColors = {Covert:'#eb4b4b',Classified:'#d32ce6',Restricted:'#8847ff','Mil-Spec Grade':'#4b69ff','Industrial Grade':'#5e98d9','Consumer Grade':'#b0b0b0',Extraordinary:'#ffd700'};
+
+// Load skins
+fetch('skins_data.json')
+  .then(r => r.json())
+  .then(function(data) {
+    var seen = {};
+    for (var i = 0; i < data.all.length; i++) {
+      var w = data.all[i][0], s = data.all[i][1], url = data.all[i][2], r = data.all[i][3];
+      if (r === 'Extraordinary') continue; // Skip knives/gloves for trade-ups
+      var key = (w + '|' + s).toLowerCase();
+      if (seen[key]) continue;
+      seen[key] = true;
+      SKINS.push({weapon: w, skin: s, url: url, rarity: r});
+    }
+    // Sort by rarity then name
+    var rarityOrder = {Covert:0,Classified:1,Restricted:2,'Mil-Spec Grade':3,'Industrial Grade':4,'Consumer Grade':5};
+    SKINS.sort(function(a,b){ return (rarityOrder[a.rarity]||99) - (rarityOrder[b.rarity]||99) || a.weapon.localeCompare(b.weapon) || a.skin.localeCompare(b.skin); });
+    
+    // Build rarity filter buttons
+    var rarities = ['Covert','Classified','Restricted','Mil-Spec Grade','Industrial Grade','Consumer Grade'];
+    var btns = '<button class="rb sel" onclick="filterRarity(this,\'\')">All</button>';
+    for (var i = 0; i < rarities.length; i++) {
+      btns += '<button class="rb" onclick="filterRarity(this,\''+rarities[i]+'\')" style="color:'+(rarityColors[rarities[i]]||'')+'">'+rarities[i].replace(' Grade','').replace('Mil-Spec','Mil-Spec')+'</button>';
+    }
+    document.getElementById('rarityBtns').innerHTML = btns;
+    activeRarity = '';
+  });
+
+var activeRarity = '';
+
+function filterRarity(btn, rarity) {
+  activeRarity = rarity;
+  document.querySelectorAll('.rb').forEach(function(b){ b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  searchSkins(document.getElementById('skinSearch').value);
+}
+
+function searchSkins(query) {
+  var q = query.toLowerCase().trim();
+  var filtered = SKINS.filter(function(s){
+    if (activeRarity && s.rarity !== activeRarity) return false;
+    if (!q) return true;
+    return (s.weapon + ' ' + s.skin).toLowerCase().includes(q);
+  }).slice(0, 50);
+  
+  var html = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var s = filtered[i];
+    var color = rarityColors[s.rarity] || '#fff';
+    html += '<div class="opt" onclick="selectSkin(\''+s.weapon+'|'+s.skin+'|'+s.rarity+'|'+encodeURIComponent(s.url)+'\')"><img src="'+s.url+'" alt=""><div class="info"><div class="name">'+s.weapon+' | '+s.skin+'</div><div class="wep">'+s.weapon+'</div></div><div class="rar" style="color:'+color+';background:'+color+'12;border:1px solid '+color+'25">'+s.rarity+'</div></div>';
+  }
+  var dd = document.getElementById('dropdown');
+  if (html) { dd.innerHTML = html; dd.classList.add('show'); }
+  else dd.classList.remove('show');
+}
+
+function selectSkin(data) {
+  var parts = data.split('|');
+  var weapon = parts[0], skin = parts[1], rarity = parts[2], url = decodeURIComponent(parts.slice(3).join('|'));
+  var color = rarityColors[rarity] || '#fff';
+  selectedSkin = {weapon: weapon, skin: skin, rarity: rarity, url: url};
+  
+  document.getElementById('dropdown').classList.remove('show');
+  document.getElementById('skinSearch').value = weapon + ' | ' + skin;
+  
+  document.getElementById('selected').innerHTML = '<img src="'+url+'" alt=""><div class="info"><div class="name">'+weapon+' | '+skin+'</div><div class="meta" style="color:'+color+'">'+rarity+'</div></div><button class="remove" onclick="deselectSkin()">× Remove</button>';
+  document.getElementById('selected').classList.add('show');
+  document.getElementById('selectedInfo').style.display = 'block';
+  document.getElementById('outRarity').textContent = rarity;
+  document.getElementById('outRarity').style.color = color;
+  
+  // Set default float range based on rarity (most common ranges)
+  var ranges = {
+    'Consumer Grade': [0, 1.0],
+    'Industrial Grade': [0, 1.0],
+    'Mil-Spec Grade': [0, 1.0],
+    'Restricted': [0, 1.0],
+    'Classified': [0, 1.0],
+    'Covert': [0, 1.0]
+  };
+  document.getElementById('floatRange').textContent = '0.00 – 1.00';
+  
+  calculate();
+}
+
+function deselectSkin() {
+  selectedSkin = null;
+  document.getElementById('selected').classList.remove('show');
+  document.getElementById('selectedInfo').style.display = 'none';
+  document.getElementById('skinSearch').value = '';
 }
 
 function getFloats() {
@@ -128,44 +242,53 @@ function calculate() {
   var vals = getFloats();
   if (!vals) {
     document.getElementById('avgRow').style.display = 'none';
-    document.getElementById('result').classList.remove('show');
+    document.getElementById('result').style.display = 'none';
     return;
   }
   var sum = 0; for (var i=0;i<vals.length;i++) sum+=vals[i];
   var avg = sum/vals.length;
+  
   document.getElementById('avgRow').style.display = 'flex';
   document.getElementById('avgFloat').textContent = avg.toFixed(6);
+  document.getElementById('result').style.display = 'block';
   
-  var minF = parseFloat(document.getElementById('minFloat').value) || 0;
-  var maxF = parseFloat(document.getElementById('maxFloat').value) || 1;
+  // Float range defaults to 0.00-1.00
+  var minF = 0, maxF = 1.0;
   var outputFloat = avg * (maxF - minF) + minF;
   
-  var targetExt = document.getElementById('targetExt').value;
-  var ranges = {fn:[0,0.07], mw:[0.07,0.15], ft:[0.15,0.38], ww:[0.38,0.45], bs:[0.45,1.0]};
-  if (targetExt && ranges[targetExt]) {
-    var r = ranges[targetExt];
-    outputFloat = Math.max(r[0], Math.min(r[1], outputFloat));
-  }
-  
   var ext, extClass, color;
-  if (outputFloat < 0.07) { ext='Factory New'; extClass='fn'; color='green'; }
-  else if (outputFloat < 0.15) { ext='Minimal Wear'; extClass='mw'; color='blue'; }
-  else if (outputFloat < 0.38) { ext='Field-Tested'; extClass='ft'; color='yellow'; }
-  else if (outputFloat < 0.45) { ext='Well-Worn'; extClass='ww'; color='orange'; }
-  else { ext='Battle-Scarred'; extClass='bs'; color='red'; }
+  if (outputFloat < 0.07) { ext='FN'; extClass='fn'; color='green'; }
+  else if (outputFloat < 0.15) { ext='MW'; extClass='mw'; color='blue'; }
+  else if (outputFloat < 0.38) { ext='FT'; extClass='ft'; color='yellow'; }
+  else if (outputFloat < 0.45) { ext='WW'; extClass='ww'; color='orange'; }
+  else { ext='BS'; extClass='bs'; color='red'; }
   
-  document.getElementById('result').classList.add('show');
   document.getElementById('outputFloat').textContent = outputFloat.toFixed(8);
   document.getElementById('outputFloat').className = 'big '+color;
   document.getElementById('outputExt').style.display = 'inline-block';
   document.getElementById('outputExt').className = 'ext '+extClass;
   document.getElementById('outputExt').textContent = ext;
-  document.getElementById('outputInfo').innerHTML = '<strong>Avg input:</strong> '+avg.toFixed(6)+' &bull; <strong>Formula:</strong> '+avg.toFixed(6)+' × ('+maxF.toFixed(4)+' − '+minF.toFixed(4)+') + '+minF.toFixed(4)+' = <strong>'+outputFloat.toFixed(8)+'</strong>';
+  
+  var info = '<strong>Average:</strong> '+avg.toFixed(6)+' &bull; <strong>Float Range:</strong> '+minF.toFixed(2)+' – '+maxF.toFixed(2);
+  if (selectedSkin) {
+    info += '<br><strong>Output:</strong> '+selectedSkin.weapon+' | '+selectedSkin.skin+' ('+selectedSkin.rarity+')';
+    info += '<br><strong>Expected:</strong> '+ext+' ('+outputFloat.toFixed(8)+')';
+  } else {
+    info += '<br>Select an output skin above to see what you could get';
+  }
+  document.getElementById('outputInfo').innerHTML = info;
 }
 
-function fillAll(val) { for(var i=0;i<10;i++) document.getElementById('f'+i).value=val; calculate(); }
-function randomizeFloats() { for(var i=0;i<10;i++) document.getElementById('f'+i).value=(Math.random()*0.8+0.01).toFixed(6); calculate(); }
-function clearAll() { for(var i=0;i<10;i++) document.getElementById('f'+i).value=''; document.getElementById('avgRow').style.display='none'; document.getElementById('result').classList.remove('show'); }
+// Build 10 float inputs
+var html = '';
+for (var i = 0; i < 10; i++) {
+  html += '<div class="fi"><label>Skin '+(i+1)+'</label><input type="number" step="0.000001" min="0" max="1" id="f'+i+'" placeholder="0.00" oninput="calculate()"></div>';
+}
+document.getElementById('floatInputs').innerHTML = html;
+
+function fillAll(v) { for(var i=0;i<10;i++) document.getElementById('f'+i).value=v; calculate(); }
+function randomize() { for(var i=0;i<10;i++) document.getElementById('f'+i).value=(Math.random()*0.8+0.01).toFixed(6); calculate(); }
+function clearAll() { for(var i=0;i<10;i++) document.getElementById('f'+i).value=''; document.getElementById('avgRow').style.display='none'; document.getElementById('result').style.display='none'; }
 fillAll(0.05);
 </script>
 </body>
